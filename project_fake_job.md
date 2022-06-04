@@ -12,7 +12,8 @@ WQD7004 Group Assignment
 -   Jenifer Mayang Jues (S2016572)
 
 # Introduction
-
+    In recent years, due to advancement in modern technology. New job advertising has become common issue. Fake job posting is becoming great concern for everyone. According to Habiba et all (2021), job advertisments which are fake and mostly willing to steal personal & professional information of job seekers instead of giving right jobs to them is known as job scam. This dataset contains 18k job description out of which about 800 are fake. The data consists of both textual information and meta-information about the jobs. 
+    
 # Initial Questions
 
 -   What are the significant features of classifying fake job postings
