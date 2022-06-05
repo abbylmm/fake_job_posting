@@ -8,12 +8,14 @@ output: github_document
 ### Group 4:
 
 -   JingYu Shen (S2113037)
--   JiPing Zhang (S2042984)
+-   JiPing Zhang (S2042894)
 -   Lee Mun Mun (S2112842)
 -   Nayli Hatim (S2149344)
 -   Jenifer Mayang Jues (S2016572)
 
 # Introduction
+
+In recent years, due to advancement in modern technology. New job advertising has become a common issue. Fake job posting is becoming great concern for everyone. According to Habiba et all (2021), job advertisements which are fake and mostly willing to steal personal & professional information of job seekers instead of giving right jobs to them is known as job scam. This dataset contains 18k job description out of which about 800 are fake. The data consists of both textual information and meta-information about the jobs.
 
 # Initial Questions
 
@@ -42,6 +44,14 @@ library(RColorBrewer)
 library(keras)
 library(tidyr)
 library(reshape2)
+library(grid)
+library(tidyverse)
+library(shadowtext)
+library(wordcloud)
+library(wordcloud2)
+library(tm)
+library(webshot)
+library(htmlwidgets)
 ```
 
 ## Load data
@@ -101,14 +111,14 @@ names(df_fake_job)
 
 ```{r}
 table(duplicated(df_fake_job$job_id))
-### there is no duplication id
+# there is no duplication id
 ```
 
 ## Check for total missing values for each feature
 
 ```{r}
 colSums(is.na(df_fake_job))
-### there are two missing values in 'benefits' column
+# there are two missing values in 'benefits' column
 ```
 
 ## List rows with missing values
@@ -120,7 +130,7 @@ sample_n(missingdf, 3)
 
 ## Visualize missing rates for each feature
 
-```{r}
+```{r, warning=FALSE}
 gg_miss_var(df_fake_job, show_pct = TRUE) + labs(y = "% Missing")
 ```
 
@@ -148,13 +158,14 @@ viz_df[viz_df == ""] <- NA
 
 ## Visualize missing profile for each feature
 
-```{r}
+```{r, warning=FALSE}
+plot_intro(viz_df, title = "Data Quality")
 plot_missing(viz_df)
 ```
 
-## Heatplot of missingness across the df
+## Heatplot of missingness across the data frame
 
-```{r}
+```{r, warning=FALSE}
 vis_miss(viz_df)
 ```
 
@@ -194,31 +205,37 @@ vis_dat(model_df)
 
 # Exploratory Data Analysis (EDA)
 
+Before building our models, we performed exploratory data analysis to understand the dataset.
+
 ## Visualize fraud and real
 
 ```{r}
-viz_df$fraudulent[viz_df$fraudulent == 1] <- "Yes"
-viz_df$fraudulent[viz_df$fraudulent == 0] <- "No"
-count <- table(viz_df$fraudulent)
-barplot(count, 
-        main="Real and Fraudulent", 
-        xlab="fraudulent", 
-        ylab="count", 
-        col="#69b3a2"
-)
+viz_df2 <- viz_df
+viz_df2$fraudulent[viz_df2$fraudulent == 1] <- "Fraud"
+viz_df2$fraudulent[viz_df2$fraudulent == 0] <- "Non Fraud"
+count <- table(viz_df2$fraudulent)
+bar <- barplot(count, 
+               main="Proportion of fraudulent job postings", 
+               xlab="fraudulent", 
+               ylab="count", 
+               col=c(rgb(0.3,0.1,0.4,0.6), rgb(0.3,0.9,0.4,0.6)))
+text(bar, count/2, labels = count)
 ```
+
+It is observable that there are 17,014 cases of legitimate job postings, while the number of fraudulent job postings is 866.
 
 ## Visualize country-wise job postings
 
 ```{r}
-temp <- na.omit(subset(viz_df, select = c(country, job_id))) %>% 
+temp <- na.omit(subset(viz_df, select = c(country))) %>% 
   group_by(country) %>% 
   summarize(n = n()) %>% 
   arrange(desc(n)) %>% 
   slice(1:10)
 
+par(mar=c(6,4,4,4))
 barplot(height=temp$n, 
-        main="Top 10 Country-wise Job Postings", 
+        main="Top 10 country-wise job postings", 
         ylab="count", 
         col=brewer.pal(10, "Set3"), 
         names.arg=c("United States",
@@ -231,111 +248,199 @@ barplot(height=temp$n,
                     "Australia",
                     "Philippines",
                     "Netherlands"), 
+        cex.names=0.7, 
+        las=2)
+```
+
+## Visualize the industries
+
+```{r}
+temp <- na.omit(subset(viz_df, select = c(industry))) %>% 
+  group_by(industry) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:10)
+
+par(mar=c(10,4,4,4))
+barplot(height=temp$n, 
+        names=temp$industry, 
+        main="Top 10 industries", 
+        ylab="count", 
+        col=brewer.pal(10, "Set3"), 
         cex.names=0.6, 
-        las=2
-)
+        las=2)
+```
+
+## Visualize the departments
+
+```{r}
+temp <- na.omit(subset(viz_df, select = c(department))) %>% 
+  group_by(department) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:10)
+
+par(mar=c(8,4,4,4))
+barplot(height=temp$n, 
+        names=temp$department, 
+        main="Top 10 departments", 
+        ylab="count", 
+        col=brewer.pal(10, "Set3"), 
+        cex.names=0.6, 
+        las=2)
 ```
 
 ## Visualize the required experiences in the jobs
 
 ```{r}
-temp <- na.omit(subset(viz_df, select = c(required_experience, job_id))) %>% 
-  group_by(required_experience) %>% 
+viz_df %>% group_by(required_experience) %>% 
   summarize(n = n()) %>% 
-  arrange(desc(n))
-
-barplot(height=temp$n, 
-        names=temp$required_experience, 
-        main="Job Postings with Required Experiences", 
-        ylab="count", 
-        col=brewer.pal(7, "Set2"), 
-        cex.names=0.6, 
-        las=2
-)
+  arrange(desc(n)) %>% 
+  slice(2:11) %>% 
+  ggplot(aes(x=reorder(required_experience, -n), y = n)) + 
+  geom_segment(aes(x=reorder(required_experience, -n), xend=reorder(required_experience, -n), y=0, yend=n), color="skyblue") + 
+  geom_point(color="steelblue", size=2, alpha=1) + 
+  theme_light() + 
+  coord_flip() + 
+  theme(panel.grid.major.y = element_blank(), 
+        panel.border = element_blank(), 
+        axis.ticks.y = element_blank()) + 
+  theme_bw() + labs(title = "Listed jobs with required experiences", 
+                    x = "Experience", 
+                    y = "Count", 
+                    fill = "Experience") + 
+  geom_text(aes(label=round(n,0)), vjust=-0.6)
 ```
 
-## Visualize job postings with company logo
+## Visualize the required education in the jobs
 
 ```{r}
-viz_df$has_company_logo[viz_df$has_company_logo == 1] <- "Yes"
-viz_df$has_company_logo[viz_df$has_company_logo == 0] <- "No"
+viz_df %>% group_by(required_education) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  slice(2:11) %>% 
+  ggplot(aes(x=reorder(required_education, -n), y = n)) + 
+  geom_segment(aes(x=reorder(required_education, -n), xend=reorder(required_education, -n), y=0, yend=n), color="skyblue") + 
+  geom_point(color="steelblue", size=2, alpha=1) + 
+  theme_light() + 
+  coord_flip() + 
+  theme(panel.grid.major.y = element_blank(), 
+        panel.border = element_blank(), 
+        axis.ticks.y = element_blank()) + 
+  theme_bw() + labs(title = "Listed jobs with required education", 
+                    x = "Education", 
+                    y = "Count", 
+                    fill = "Education") + 
+  geom_text(aes(label=round(n,0)), vjust=-0.6)
+```
 
-df1 <- na.omit(subset(viz_df, select = c(employment_type, has_company_logo))) %>% 
-  group_by(employment_type, has_company_logo) %>% 
-  summarize(yes = n(), .groups = 'drop') %>% 
-  filter(has_company_logo=="Yes")
-df1 <- subset(df1, select = c(employment_type, yes))
-df2 <- na.omit(subset(viz_df, select = c(employment_type, has_company_logo))) %>% 
-  group_by(employment_type, has_company_logo) %>% 
-  summarize(no = n(), .groups = 'drop') %>% 
-  filter(has_company_logo=="No")
-df2 <- subset(df2, select = c(no))
-df_new <- cbind(df1, df2)
+## Visualize fraudulent job postings based on employment types
 
+```{r}
+viz_df2 <- viz_df
+viz_df2$employment_type <- ifelse(is.na(viz_df2$employment_type), "Missing", viz_df2$employment_type)
+df1 <- subset(viz_df2, select = c(employment_type, fraudulent)) %>% 
+  group_by(employment_type, fraudulent) %>% 
+  summarize(yes = sum(fraudulent==1), .groups = 'drop') %>% 
+  filter(fraudulent==1)
+df2 <- subset(viz_df2, select = c(employment_type, fraudulent)) %>% 
+  group_by(employment_type, fraudulent) %>% 
+  summarize(no = sum(fraudulent==0), .groups = 'drop') %>% 
+  filter(fraudulent==0)
+df_new <- merge(df1, df2, by = c("employment_type")) %>% 
+  group_by(employment_type) %>% 
+  summarize(pct_fraud = round(yes/(yes+no), digits=3), 
+            pct_non_fraud = 1-pct_fraud, .groups = 'drop') %>% 
+  mutate(employment_type = factor(employment_type, 
+                                  levels = c('Part-time',
+                                             'Missing',
+                                             'Other',
+                                             'Full-time',
+                                             'Contract',
+                                             'Temporary')))
 fig <- df_new %>% plot_ly()
-fig <- fig %>% add_trace(x = ~employment_type, y = ~no, type = 'bar', 
-             text = ~no, textposition = 'auto', name = 'No', 
+fig <- fig %>% add_trace(x = ~employment_type, y = ~pct_non_fraud, type = 'bar', 
+             text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
-                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
-fig <- fig %>% add_trace(x = ~employment_type, y = ~yes, type = 'bar', 
-            text = ~yes, textposition = 'auto', name = 'Yes', 
+                           line = list(color = 'rgb(8,48,107)', width = 0.8)))
+fig <- fig %>% add_trace(x = ~employment_type, y = ~pct_fraud, type = 'bar', 
+            text = ~paste0(pct_fraud*100,"%"), textposition = 'outside', name = 'pct_fraud', 
             marker = list(color = 'rgb(58,200,225)', 
-                          line = list(color = 'rgb(8,48,107)', width = 1.5)))
-fig <- fig %>% layout(title = "Job Postings with Company Logo based on Employment Type",
+                          line = list(color = 'rgb(8,48,107)', width = 0.8)))
+fig <- fig %>% layout(title = "Employment types with % fraud and non-fraud",
          barmode = 'group',
          xaxis = list(title = "employment_type"),
-         yaxis = list(title = "count"))
+         yaxis = list(title = "percentage"))
 fig
 ```
 
-## Visualize job postings with questions
+## Visualize fraudulent job postings based on required experiences
 
 ```{r}
-viz_df$has_questions[viz_df$has_questions == 1] <- "Yes"
-viz_df$has_questions[viz_df$has_questions == 0] <- "No"
-
-df1 <- na.omit(subset(viz_df, select = c(employment_type, has_questions))) %>% 
-  group_by(employment_type, has_questions) %>% 
-  summarize(yes = n(), .groups = 'drop') %>% 
-  filter(has_questions=="Yes")
-df1 <- subset(df1, select = c(employment_type, yes))
-df2 <- na.omit(subset(viz_df, select = c(employment_type, has_questions))) %>% 
-  group_by(employment_type, has_questions) %>% 
-  summarize(no = n(), .groups = 'drop') %>% 
-  filter(has_questions=="No")
-df2 <- subset(df2, select = c(no))
-df_new <- cbind(df1, df2)
-
+viz_df2 <- viz_df
+viz_df2$required_experience <- ifelse(is.na(viz_df2$required_experience), "Not Applicable", viz_df2$required_experience)
+df1 <- subset(viz_df2, select = c(required_experience, fraudulent)) %>% 
+  group_by(required_experience, fraudulent) %>% 
+  summarize(yes = sum(fraudulent==1), .groups = 'drop') %>% 
+  filter(fraudulent==1)
+df2 <- subset(viz_df2, select = c(required_experience, fraudulent)) %>% 
+  group_by(required_experience, fraudulent) %>% 
+  summarize(no = sum(fraudulent==0), .groups = 'drop') %>% 
+  filter(fraudulent==0)
+df_new <- merge(df1, df2, by = c("required_experience")) %>% 
+  group_by(required_experience) %>% 
+  summarize(pct_fraud = round(yes/(yes+no), digits=3), 
+            pct_non_fraud = 1-pct_fraud, .groups = 'drop') %>% 
+  mutate(required_experience = factor(required_experience, 
+                                      levels = c('Executive',
+                                                 'Entry level',
+                                                 'Not Applicable',
+                                                 'Director',
+                                                 'Mid-Senior level',
+                                                 'Internship',
+                                                 'Associate')))
 fig <- df_new %>% plot_ly()
-fig <- fig %>% add_trace(x = ~employment_type, y = ~no, type = 'bar', 
-             text = ~no, textposition = 'auto', name = 'No', 
+fig <- fig %>% add_trace(x = ~required_experience, y = ~pct_non_fraud, type = 'bar', 
+             text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
-                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
-fig <- fig %>% add_trace(x = ~employment_type, y = ~yes, type = 'bar', 
-            text = ~yes, textposition = 'auto', name = 'Yes', 
+                           line = list(color = 'rgb(8,48,107)', width = 0.8)))
+fig <- fig %>% add_trace(x = ~required_experience, y = ~pct_fraud, type = 'bar', 
+            text = ~paste0(pct_fraud*100,"%"), textposition = 'outside', name = 'pct_fraud', 
             marker = list(color = 'rgb(58,200,225)', 
-                          line = list(color = 'rgb(8,48,107)', width = 1.5)))
-fig <- fig %>% layout(title = "Job Postings with Questions based on Employment Type",
+                          line = list(color = 'rgb(8,48,107)', width = 0.8)))
+fig <- fig %>% layout(title = "Required experiences with % fraud and non-fraud",
          barmode = 'group',
-         xaxis = list(title = "employment_type"),
-         yaxis = list(title = "count"))
+         xaxis = list(title = "required_experience"),
+         yaxis = list(title = "percentage"))
 fig
 ```
 
-## Visualize the job function with fraudulent job postings
+## Visualize fraudulent job postings based on job functions
 
 ```{r}
-temp <- na.omit(subset(viz_df, select = c(function., fraudulent))) %>% 
+viz_df2 <- viz_df
+viz_df2$fraudulent[viz_df2$fraudulent == 1] <- "Fraud"
+viz_df2$fraudulent[viz_df2$fraudulent == 0] <- "Non Fraud"
+temp <- na.omit(subset(viz_df2, select = c(function., fraudulent))) %>% 
   group_by(function., fraudulent) %>% 
   summarize(n = n(), .groups = 'drop') %>% 
   group_by(function.) %>% 
-  summarize(pct_fraud = round(sum(n[fraudulent=="Yes"]/sum(n)), digits=2), 
-            pct_good = 1-pct_fraud, .groups = 'drop') %>% 
+  summarize(pct_fraud = round(sum(n[fraudulent=="Fraud"]/sum(n)), digits=3), 
+            pct_non_fraud = 1-pct_fraud, .groups = 'drop') %>% 
   arrange(desc(pct_fraud)) %>% 
-  slice(1:10)
-
+  slice(1:10) %>% 
+  mutate(function. = factor(function., 
+                            levels = c('Administrative',
+                                       'Financial Analyst',
+                                       'Accounting/Auditing',
+                                       'Distribution',
+                                       'Other',
+                                       'Finance',
+                                       'Engineering',
+                                       'Business Development',
+                                       'Advertising',
+                                       'Customer Service')))
 melted_temp <- melt(temp, id = "function.")
-
 ggplot(melted_temp, aes(x = function., y = value, fill = variable)) + 
   geom_bar(position = "fill", 
            stat = "identity", 
@@ -345,9 +450,102 @@ ggplot(melted_temp, aes(x = function., y = value, fill = variable)) +
   scale_y_continuous(labels = scales::percent) + 
   geom_text(aes(label = paste0(value*100,"%")), 
             position = position_stack(vjust = 0.6), size = 2) + 
-  ggtitle("Job Function with Fraudulent Job Postings (in %)") + 
+  ggtitle("Job functions with % fraud and non-fraud") + 
   xlab("function") + 
   ylab("percentage")
+```
+
+## Visualize fraudulent job postings based on required education
+
+```{r}
+temp <- na.omit(subset(viz_df2, select = c(required_education, fraudulent))) %>% 
+  group_by(required_education, fraudulent) %>% 
+  summarize(n = n(), .groups = 'drop') %>% 
+  group_by(required_education) %>% 
+  summarize(pct_fraud = round(sum(n[fraudulent=="Fraud"]/sum(n)), digits=3), 
+            pct_non_fraud = 1-pct_fraud, .groups = 'drop') %>% 
+  arrange(desc(pct_fraud)) %>% 
+  slice(1:10) %>% 
+  mutate(required_education = factor(required_education, 
+                                     levels = c("Some High School Coursework",
+                                                "Certification",
+                                                "High School or equivalent",
+                                                "Master's Degree",
+                                                "Professional",
+                                                "Unspecified",
+                                                "Doctorate",
+                                                "Some College Coursework Completed",
+                                                "Associate Degree",
+                                                "Bachelor's Degree")))
+melted_temp <- melt(temp, id = "required_education")
+ggplot(melted_temp, aes(x = required_education, y = value, fill = variable)) + 
+  geom_bar(position = "fill", 
+           stat = "identity", 
+           color = "black", 
+           width = 0.8) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.6)) + 
+  scale_y_continuous(labels = scales::percent) + 
+  geom_text(aes(label = paste0(value*100,"%")), 
+            position = position_stack(vjust = 0.6), size = 2) + 
+  ggtitle("Required education with % fraud and non-fraud") + 
+  xlab("required_education") + 
+  ylab("percentage")
+```
+
+## Word cloud of fraudulent job postings
+
+```{r, warning=FALSE}
+selected_df <- subset(viz_df, fraudulent == 1)
+
+# Create a vector containing only the text
+text <- selected_df$title
+
+# Create a corpus
+docs <- Corpus(VectorSource(text))
+
+docs <- docs %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stripWhitespace)
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeWords, stopwords("english"))
+
+dtm <- TermDocumentMatrix(docs) 
+matrix <- as.matrix(dtm) 
+words <- sort(rowSums(matrix), decreasing=TRUE) 
+df <- data.frame(word = names(words), freq=words)
+
+my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
+saveWidget(my_graph, "wordcloud_fraud.html", selfcontained = F)
+my_graph
+```
+
+## Word cloud of non-fraudulent job postings
+
+```{r, warning=FALSE}
+selected_df <- subset(viz_df, fraudulent == 0)
+
+# Create a vector containing only the text
+text <- selected_df$title
+
+# Create a corpus
+docs <- Corpus(VectorSource(text))
+
+docs <- docs %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stripWhitespace)
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeWords, stopwords("english"))
+
+dtm <- TermDocumentMatrix(docs) 
+matrix <- as.matrix(dtm) 
+words <- sort(rowSums(matrix), decreasing=TRUE) 
+df <- data.frame(word = names(words), freq=words)
+
+my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
+saveWidget(my_graph, "wordcloud_real.html", selfcontained = F)
+my_graph
 ```
 
 # Modeling
