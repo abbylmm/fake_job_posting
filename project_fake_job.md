@@ -814,10 +814,125 @@ my_graph
 
 # Modeling
 
+## Regression
+```{r}
+#Converting continuous variables into binary variables
+model_df$job_id <- as.factor(ifelse(model_df$job_id > median(model_df$job_id), 1, 0))
+```
+
+
+```{r}
+#View the number of two variable categories
+summary(model_df$job_id)
+```
+#Visualizing Data
+```{r}
+par(mfrow=c(2,5))
+for(i in 2:5) {
+    hist(model_df[,i], main=names(model_df)[i])
+}
+```
+```{r}
+par(mfrow=c(1,5))
+for(i in 1:5) {
+    boxplot(model_df[,i], main=names(model_df)[i])
+}
+```
+```{r}
+#Calculate the correlation between each pair of numeric variables
+library(corrplot)
+correlations <- cor(model_df[,2:5])
+corrplot(correlations, method="circle")
+```
+
+```{r}
+# Using the same seed value, reproduce the division of the training set and the test set
+set.seed(2021)
+train_index <- sample(dim(model_df)[1], 0.7 * dim(model_df)[1])
+model_dftrain<- model_df[train_index, ]
+model_dftest <- model_df[-train_index, ]
+paste("train sample size: ", dim(model_dftrain)[1])
+paste("test sample size: ", dim(model_dftest)[1])
+```
+```{r}
+#Introducing AUC calculation function
+library("ROCR")
+calcAUC <- function(predcol, outcol) {
+  perf <- performance(prediction(predcol, outcol == 1), "auc")
+  as.numeric(perf@y.values)
+}
+```
+
+
+```{r}
+# Logistics Regression
+lr_model <- glm(formula = job_id ~ has_company_logo + has_questions + fraudulent+has_company_logo, family = "binomial",     data = model_df)
+summary(lr_model)
+```
+```{r}
+# Predict the train set and test set respectively
+lr_pred_train <- predict(lr_model, newdata = model_dftrain, type = "response")
+lr_pred_test <- predict(lr_model, newdata = model_dftest, type = "response")
+```
+```{r}
+#Fitting the train data of the model for prediction
+glm.probs <- predict(lr_model,type = "response")
+glm.probs[1:5]
+glm.pred <- ifelse(glm.probs > 0.5, "Ture", "FALSE")
+```
+
+```{r}
+# Calculate AUC of train set and test set
+calcAUC(lr_pred_train, model_dftrain$job_id)
+calcAUC(lr_pred_test,  model_dftest$job_id)
+
+```
 ## Classification
 
-## Regression
+```{r}
+# Import package
+# Import random forest package
+library(randomForest)
+```
 
+```{r}
+# Random forest model
+rf_model <- randomForest(job_id ~ has_company_logo + has_questions + fraudulent,model_dftrain, nodesize = 10, importance = T)
+# Demonstrate the importance of model variables
+importance(rf_model)
+```
+
+```{r}
+# Predict
+rf_pred_train <- predict(rf_model, newdata = model_dftrain, type = "class")
+rf_pred_test <- predict(rf_model, newdata = model_dftest, type = "class")
+```
+
+```{r}
+# Calculate AUC value
+calcAUC(as.numeric(rf_pred_train),model_dftrain$job_id)
+calcAUC(as.numeric(rf_pred_test), model_dftest$job_id)
+
+```
+```{r}
+# Import package for KNN model
+library(kknn)
+```
+
+
+```{r}
+# Build KNN model
+knn <- kknn(job_id ~ has_company_logo + has_questions + fraudulent, model_dftrain, model_dftest, k = 25)
+View(knn)
+```
+
+
+```{r}
+# Predict and calculate the value of AUC on the test set
+knn_pred_test <- predict(knn, newdata = model_dftest)
+calcAUC(as.numeric(knn_pred_test), model_dftest$job_id)
+
+```
 # Data Prediction
 
 # Evaluation
