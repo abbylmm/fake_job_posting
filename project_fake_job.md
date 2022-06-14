@@ -1,4 +1,4 @@
-WQD7004 Group Assignment
+WQD7004 Group Project
 ================
 
 # Fake Job Posting Analysis
@@ -13,26 +13,66 @@ WQD7004 Group Assignment
 
 # Introduction
 
-In recent years, due to advancement in modern technology. New job
-advertising has become a common issue. Fake job posting is becoming
-great concern for everyone. According to Habiba et all (2021), job
-advertisements which are fake and mostly willing to steal personal &
-professional information of job seekers instead of giving right jobs to
-them is known as job scam. This dataset contains 18k job description out
-of which about 800 are fake. The data consists of both textual
-information and meta-information about the jobs.
-
-# Initial Questions
-
--   What are the significant features of classifying fake job postings
--   Which classification model is the best to classify fake job postings
+Unlike the past when job seekers used newspapers to seek job
+opportunities, job seekers nowadays use employment website such as
+JobStreet, Linkedin, Indeed and countless due to advancement in modern
+technology and social communication. The authenticity of job postings
+has become critical with a constant increase in the number of job scams.
+According to Habiba et all (2021), job advertisements which are fake and
+steal personal & professional information of job seekers instead of
+giving right jobs to them is known as job scam. Job scams often involve
+fake online job ads in social platforms and untrusted job portals
+offering high paying jobs. Victims may also receive unsolicited messages
+from social media such as Whatsapp, Facebook, WeChat that offers jobs
+that do not exist. For example, job scammers will ask victims to
+disclose personal and/or banking details or transfer upfront fees to
+secure a interview or more information about the fraud jobs. Due to the
+growing concerns about job scams, our aim is to raise awareness of job
+seekers in the job application process and give a early warning sign to
+job seekers with Machine Learning (ML) and Natural Language Processing
+(NLP) approaches.
 
 # Objectives
 
--   To identify key features of fraudulent job postings
--   To build a model to classify real or fake job postings
+-   To identify the key features of fraudulent job postings.
+-   To build a model to classify real or fake job postings.
+
+# Initial Questions
+
+-   What are the key features/characteristics of fraudulent job
+    postings?
+-   Which classification model is the best to determine whether the job
+    is real or not?
 
 # Data Cleaning and Pre-processing
+
+The dataset used in this project was published by the Employment Scam
+Aegean Dataset (EMSCAD) and was retrieved from
+[Kaggle](https://www.kaggle.com/datasets/shivamb/real-or-fake-fake-jobposting-prediction)
+and this data contains 17,880 observations out of which about 866 are
+fake, and 18 features. The data consists of a combination of numeric and
+text features. A brief definition of the variables is given below:
+
+| Variable            | Description                                              |
+|---------------------|----------------------------------------------------------|
+| job_id              | ID of each job posting                                   |
+| title               | Description of position or job                           |
+| location            | Where the job is located                                 |
+| department          | Department of the job offered                            |
+| salary_range        | Expected salary range                                    |
+| company_profile     | Company information                                      |
+| description         | Description about the position offered                   |
+| requirements        | Pre-requisites to qualify for the job                    |
+| benefits            | Benefits provided by the job                             |
+| telecommuting       | Is work from home or remote work allowed                 |
+| has_company_logo    | Does the post have a company logo                        |
+| has_questions       | Does the post have any questions                         |
+| employment_type     | Full-time, part-time, contract, temporary and others     |
+| required_experience | Experience level, e.g. Entry level, Executive, Director… |
+| required_education  | Education level, e.g. High School, Bachelor, Master…     |
+| industry            | Relevant industry                                        |
+| function            | Job’s functionality                                      |
+| fraudulent          | Target variable (0: Real, 1: Fake)                       |
 
 ## Import libraries
 
@@ -42,49 +82,47 @@ information and meta-information about the jobs.
 df <- read.csv("https://raw.githubusercontent.com/abbylmm/fake_job_posting/main/data/fake_job_postings.csv")
 ```
 
-## Summary data
+## Display n sample of the data
 
 ``` r
 df_fake_job <- df
 sample_n(df_fake_job, 3)
 ```
 
-    ##   job_id                                                             title
-    ## 1   4097                                         Hero Developer Evangelist
-    ## 2   9345                                           English Teacher Abroad 
-    ## 3   2430 2 Full-Time Caregivers for a Gentle, Kind Woman with Disabilities
-    ##                location department salary_range
-    ## 1 US, CA, San Francisco                        
-    ## 2    US, VA, Blacksburg                        
-    ## 3   US, OR, SE Portland                        
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                company_profile
-    ## 1                                                                                                                                                                                                           Mashape is the largest, most trafficked API marketplace/hub in the world.Mashape is a revenue generating startup powering thousands of APIs (both private and public) and Applications - itâ\200\231s used in almost 100 countries by thousands of developers and adopted in every major industry including finance, healthcare, military, agriculture, insurance, government, media, e-commerce, retail, aviation, manufacturing and telecom.Mashape is funded by tier 1 VC firms including Index Ventures, NEA, CRV, Stanford University, Jeff Bezos and Eric Schmidt.
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        We help teachers get safe &amp; secure jobs abroad :)
-    ## 3 United Cerebral Palsy of Oregon &amp; SW Washington (UCP) supports adults with all kinds of developmental disabilities (not just cerebral palsy), so that they can live the life of their dreams.We're growing, so you will see lots of exciting job openings in the next few months!WHY WORK FOR UCP?As an employee of UCP, you'll be proud of the work you do, every day! Our employees assist the people we support to live independently in their own homes and apartments, find and keep their dream jobs, make community connections, serve as their own advocates, and make their own choices.Â You'll get the chance to work for one of the 100 Best Non-Profit Employers in Oregon. We'reÂ fun and flexible, and there's plenty of room for advancement and growth.
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              description
-    ## 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             You should know how to code. A specific programming language is not necessary in this case, but an overall understanding of machines, code and APIs is required.De facto, you will organize and attend hackathons - you should have strong communication skills. You will inspire developers, generate contents from blog posts to tweets.Â You should have a naturally affection in helping people.You will make our big community of developers happy through responsive and outstanding dev support.You decide which conferences/summits will need to be sponsored, put the base for monthly meet-ups around US. Also, you we'll decide the merchandise, the strategy to have a merchandise that people would love to wear - everyday. You will take care of the overall external communication of Mashape.You will also be in charge of discovering new viral mechanics to build into the products, to accelerate the users base. You will think and create unconventional marketing actions. You will also take care of the community and analyze the happiness of our community.You will identify and contact APIs that can list their services on Mashape; also you will think and activate strategic partnerships.
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Play with kids, get paid for itÂ Love travel? Jobs in Asia$1,500+ USD monthly ($200 Cost of living)Housing provided (Private/Furnished)Airfare ReimbursedExcellent for student loans/credit cardsGabriel Adkins : #URL_ed9094c60184b8a4975333957f05be37e69d3cdb68decc9dd9a4242733cfd7f7##URL_75db76d58f7994c7db24e8998c2fc953ab9a20ea9ac948b217693963f78d2e6b#12 month contract : Apply todayÂ 
-    ## 3 Are you looking for a caregiving job thatâ\200\231s fun and empowering? Would you like the chance to work one-on-one, making a real difference every day?If so, United Cerebral Palsy (UCP) might have the perfect position for you! We are currently seeking 2 Personal Assistants (caregivers) for a woman who experiences developmental disabilities.She is an incredibly kind, sweet and gentle person with a great sense of humor. She has a busy social life, but needs your assistance to communicate. She also needs your assistance with the activities of daily living, since she uses a wheelchair. She likes to work with people who are upbeat and fun. You will work out of her apartment, which is located in the Hazelwood neighborhood of SE Portland. (No calls, please)Â HOURS:Position 1 (40 hours per week): 8pm on Saturday through noon on Monday. Work your regular hours on agency holidays.Position 2 (40 hours per week): Monday-Wednesday overnights (8pm until 8am the next day); and 8pm to midnight on Thursdays. Work your regular hours on agency holidays.Â DUTIES:Plan lots of fun activities, such as creating jewelry items, listening to country music, going shopping, and going on road trips.Assist her to socialize, by planning activities with her wide circle of friends, and helping her to communicate since she doesnâ\200\231t use words.Perform household chores.Keep her safe and healthy by administering medications, feeding her via her G-tube, and monitoring her health concerns. Assist with personal hygiene needs, including providing full assistance with bathing, dressing and incontinence care. Reposition her every 4 hours overnight.Â ABOUT UCP:UCP is a thriving non-profit that was recently ranked as one of the 100 Best Non-Profit employers in Oregon.We support adults with all kinds of developmental disabilities so that they can live, work and play independently.Find out more about us at #URL_2b35257099321dacb52af707d4a6bdf5dd187d81d6bfd24398f0e5b68a6727a7#.UCP is an Equal Opportunity Employer, and actively seeks applicants from diverse backgrounds.Â 
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       requirements
-    ## 1                                                                                You're an API HustlerYou love to communicate with developers and you measure the success by the happiness of our communityYou have built web or mobile apps before and you feel yourself more a generalist developer.You always want to discover new paths and new technologiesYou have outstanding written and oral communication skillsYou are able to travel worldwide and adapt yourself in new countries and culturesYou should have built at least one community around something you cared
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                              University degree required.Â TEFL / TESOL / CELTA or teaching experience preferred but not necessaryCanada/US passport holders only
-    ## 3 Must possess a high school diploma or GED, and be at least 18 years old.Must pass a physical with a lifting test of 75lbs, drug test, reference check, and criminal history background check.Cannot be allergic to cats, as there are cats in the home (although you wonâ\200\231t see them very often).We prefer applicants with experience in developmental disability field.We prefer applicants who we can insure to drive our wheelchair-accessible van (you would need to be 21 years old or older, and have at least 3 years of driving experience and a clean driving record).
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 benefits
-    ## 1 Â - As an early employee you will get a true stake in the companyÂ - Competitive salariesÂ Â - Poker nightsÂ Â - Apple equipmentsÂ Â - Italian Food cooked by the foundersÂ - Free lunch 2 times a week.Â - Official mashaperÂ Â - 1 week/year in a spiritual retreat with the team somewhere in the worldÂ - A 2nd family Â - whatever problem outside of the work, weâ\200\231ll be thereÂ - Vacation days &amp; time offÂ - Awesome medical, dental, &amp; vision insuranceÂ - 401kÂ - Company dinners &amp; happy hourÂ Â - Much moreâ\200¦
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    See job description
-    ## 3                                                                                                                                                                                                                                                     $9.47/hour, 5% increase to $9.95/hour after successful 90-day Trial Service Period.401k plan with company match.Fully paid training.Generous paid time off.Full medical benefits (including medical, vision and alternative) for employee, spouse/domestic partner and dependents.
-    ##   telecommuting has_company_logo has_questions employment_type
-    ## 1             0                1             1       Full-time
-    ## 2             0                1             1        Contract
-    ## 3             0                1             1       Full-time
-    ##   required_experience        required_education             industry
-    ## 1      Not Applicable                                       Internet
-    ## 2                             Bachelor's Degree Education Management
-    ## 3         Entry level High School or equivalent                     
+    ##   job_id                                                     title
+    ## 1  12089                                  Sales Operations Analyst
+    ## 2  14067                                       Senior C# Developer
+    ## 3  15540 Master Scheduler/ Materials Manager Job In cincinnati, OH
+    ##              location department salary_range
+    ## 1    US, NY, New York Operations          0-0
+    ## 2     US, WA, Seattle                        
+    ## 3 US, CA, Los Angeles                        
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                company_profile
+    ## 1 Namely is the leading end-to-end HR and payroll platform for growing companies. Offerings include human payroll, benefits administration, time management, human capital management, performance management, and employee engagement. In addition, each company is assigned its own account manager, available 24/7 for ongoing support and training for each of Namelyâ\200\231s features. Namely is used by some of the worldâ\200\231s most innovative and exciting companies from many industries, including media, technology, commerce, and professional services.
+    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Startup Recroot matches talent with with early-mid stage startups!
+    ## 3                                                                                                                                                                                                                                                                                                                         We Provide Full Time Permanent Positions for many medium to large US companies. We are interested in finding/recruiting high quality candidates in IT, Engineering, Manufacturing and other highly technical and non-technical jobs.
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   description
+    ## 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Namely is an agile startup dedicated toÂ building an end-to-end Human Capital Management platform for businesses of all sizes â\200“ some of the worldâ\200\231s most innovative and exciting companies from many industries useÂ Namely for HR Management. Our users are varied (HR administrators, managers, and average employees), and our clients each have their own culture and #URL_8869fa3fa07d85357b4177d1dad41e67b47a61deef5973cf8ecf1f1170de770d# you are:The position is based in Manhattan, NY. WeÂ offer a competitive salary with great benefits, and an extremely fun environment.RESPONSIBILITIESCRM &amp; Sales Force Process OptimizationDrive the design, roll-out and adoption of sales methodology, processes and tools that support the selling process and improve the customer experienceDesign and generate dashboards, reports and statistics that support better decision making and process improvement within the organization, including sales forecasting, win/loss analysis, and market trend analysis, etc.Collaborate with Sales and Marketing in customer segmentation, lead generation and monitoring the effectiveness of marketing and promotional programs.Work with end users to provide best practices and tips on Salesforce usage including training, documentation and support as necessary.Â Proposal/RFP/Contract ManagementAssist the business contract process in collaboration with legal, key account and sales management.Provide oversight to pricing and contract compliance.
+    ## 2 Tango Card is the first company to provide Rewards-as-a-Service, RaaSÂ® to enterprise customers. Just as Salesforce moved CRM to the cloud, Tango Card is moving loyalty and rewards to the cloud â\200“ a $50 Billion dollar industry in the US alone.Weâ\200\231re a 30 person team based in West Seattle. We have filed 3 patents, have a fantastic sales pipeline, and are growing very quickly. We recently completed a significant Series B financing round and our stellar investor group now consists of Allegro Venture Partners, Floodgate Capital, Eric Schmidtâ\200\231s Innovation Endeavors, SWaN and Legend partners and WTI. We are looking to add a few absolutely stellar engineers to our team to build the products and capabilities that will take us to the next level.We are looking for a results-oriented developer who can:Rapidly build innovative software products and applicationsBuild enterprise-level products and applications that are stable, secure and scalableDo all of this on aggressive schedulesWork effectively both independently and as part of a teamYou will be successful at Tango Card if you can:Respond quickly to project prioritiesMultitask in a fast-paced work environmentDo what it takes to get quality products online, on timeWork successfully in a startup environment while bringing you own voice to what we doBe passionate, collaborative and diligent about design, development and testingTechnical skills we require:Expert in C#, #URL_01a736d89d2f0b19de700923d2c312837e180465650804d0f84105352812bf9a# (latest versions) and able to work with multiple languages and platformsExperience in MVC, LINQ, JSON, MS SQL and Entity framework desiredExperience building and consuming industry standard RESTful web-servicesMust be familiar with distributed version control system (like Github)Experience with agile development processMust have strong critical thinking and problem solving skills4+ years of software development and testing experienceComputer Science degree (or equivalent)Cultural fit:There has to be a strong fit with our culture for you to be successful. Key elements that define Tango Cardâ\200\231s culture are:We have a positive, can do attitudeWe set a higher standard in everything we doWe delight our external customers and keep our focus externallyWe have a sense of urgencyWe are great at setting and meeting commitmentsWe win or lose as a team, not as individualsWe are fired up and love winning!More information about Tango Card:Tango Card has created the ideal rewards and loyalty platform for the modern, mobile and social enterprise.We have 200 live enterprise customers today, we closed a $4.125M series B round at the end of April 2013, and we work with some of the largest customers in the world including Microsoft, Salesforce, Twitter and Intuit, as well as some successful emerging companies like Beintoo, Extole, Plink, and TrialPay.We also work with the top Gift Card brands in the country including Amazon, Starbucks, and REI locally, and Target, Walmart, Home Depot and almost 50 more nationally. Last but not least, we partner with many of the most respected non-profits in the country including the National Park Foundation and Habitat for Humanity.
+    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 BA/BS degree - Business or Technicalâ\200¢APICS certification desirableâ\200¢5-8 years experience in Manufacturing and/or Materials managementâ\200¢Experienced user of computer systems.â\200¢SAP experience required.
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          requirements
+    ## 1                                                                 BA/BS in business/information systems, finance, math, a related field.1-3 years of experiences with #URL_8d92932a488fb7e172d73a0f6813d06d464f1f03705d2825f86b2c7947d60a86#, or similar CRM Experience required leads, including work implementing Salesforce and/or redesigning and significantly enhancing how the system is used within an organization.1-3 years of sales operations, finance or analytics experience preferably in a sales environmentStrong analytical and problem solving skills.Attention to detail and thoroughness in completing work tasks.Strong proficiency with Microsoft Office suite
+    ## 2                                                                       Technical skills we require:Expert in C#, #URL_01a736d89d2f0b19de700923d2c312837e180465650804d0f84105352812bf9a# (latest versions) and able to work with multiple languages and platformsExperience in MVC, LINQ, JSON, MS SQL and Entity framework desiredExperience building and consuming industry standard RESTful web-servicesMust be familiar with distributed version control system (like Github)Experience with agile development processMust have strong critical thinking and problem solving skills4+ years of software development and testing experienceComputer Science degree (or equivalent)
+    ## 3 Minimum Requirements for the Job :BA/BS degree - Business or Technicalâ\200¢APICS certification desirableâ\200¢5-8 years experience in Manufacturing and/or Materials managementâ\200¢Experienced user of computer systems.â\200¢SAP experience required.Job Description:Plan and control all scheduling activities supporting assigned brands. Balance production and inventory levels with demand to support target consistent with 99% customer service levels, inventory turn goals and capacity utilization/staffing requirements.VisitÂ  :Â #URL_ec64af2b4fe2ca316e828f93b0cd098c22f8beba98dcac09d4dd7384b221a5e8#-#URL_9753a54b28303bf636a2816399b9c255d76fabb791336a4c748da2611a23264f#
+    ##   benefits telecommuting has_company_logo has_questions employment_type
+    ## 1                      0                1             1       Full-time
+    ## 2                      0                0             1       Full-time
+    ## 3                      0                0             0       Full-time
+    ##   required_experience required_education              industry
+    ## 1           Associate  Bachelor's Degree     Computer Software
+    ## 2    Mid-Senior level                        Computer Software
+    ## 3    Mid-Senior level  Bachelor's Degree Management Consulting
     ##                function. fraudulent
-    ## 1 Information Technology          0
-    ## 2                                 0
-    ## 3   Health Care Provider          0
+    ## 1                  Sales          0
+    ## 2 Information Technology          0
+    ## 3             Management          0
+
+## Summary data
 
 ``` r
 summary(df_fake_job)
@@ -129,7 +167,7 @@ summary(df_fake_job)
 ## Check all the missing values - ‘empty’
 
 ``` r
-skim(df_fake_job)
+skim_without_charts(df_fake_job)
 ```
 
 |                                                  |             |
@@ -166,13 +204,13 @@ Data summary
 
 **Variable type: numeric**
 
-| skim_variable    | n_missing | complete_rate |    mean |      sd |  p0 |     p25 |    p50 |      p75 |  p100 | hist  |
-|:-----------------|----------:|--------------:|--------:|--------:|----:|--------:|-------:|---------:|------:|:------|
-| job_id           |         0 |             1 | 8940.50 | 5161.66 |   1 | 4470.75 | 8940.5 | 13410.25 | 17880 | ▇▇▇▇▇ |
-| telecommuting    |         0 |             1 |    0.04 |    0.20 |   0 |    0.00 |    0.0 |     0.00 |     1 | ▇▁▁▁▁ |
-| has_company_logo |         0 |             1 |    0.80 |    0.40 |   0 |    1.00 |    1.0 |     1.00 |     1 | ▂▁▁▁▇ |
-| has_questions    |         0 |             1 |    0.49 |    0.50 |   0 |    0.00 |    0.0 |     1.00 |     1 | ▇▁▁▁▇ |
-| fraudulent       |         0 |             1 |    0.05 |    0.21 |   0 |    0.00 |    0.0 |     0.00 |     1 | ▇▁▁▁▁ |
+| skim_variable    | n_missing | complete_rate |    mean |      sd |  p0 |     p25 |    p50 |      p75 |  p100 |
+|:-----------------|----------:|--------------:|--------:|--------:|----:|--------:|-------:|---------:|------:|
+| job_id           |         0 |             1 | 8940.50 | 5161.66 |   1 | 4470.75 | 8940.5 | 13410.25 | 17880 |
+| telecommuting    |         0 |             1 |    0.04 |    0.20 |   0 |    0.00 |    0.0 |     0.00 |     1 |
+| has_company_logo |         0 |             1 |    0.80 |    0.40 |   0 |    1.00 |    1.0 |     1.00 |     1 |
+| has_questions    |         0 |             1 |    0.49 |    0.50 |   0 |    0.00 |    0.0 |     1.00 |     1 |
+| fraudulent       |         0 |             1 |    0.05 |    0.21 |   0 |    0.00 |    0.0 |     0.00 |     1 |
 
 ## Split location to country, state, city and fill empty with NA
 
@@ -288,46 +326,46 @@ missingdf <- df_fake_job[!complete.cases(df_fake_job), ]
 sample_n(missingdf, 3)
 ```
 
-    ##   job_id                                            title
-    ## 1  10401                Minnesota Communication Assistant
-    ## 2  14898 Product Specialist / Customer Success Specialist
-    ## 3   8896                                INSTALLERS NEEDED
-    ##                  department
-    ## 1                 CSD Relay
-    ## 2 Business:Customer Success
-    ## 3                          
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   company_profile
-    ## 1 Why CSD?CSD is not only a great place to work, but also to learn, grow and give back to the community. Our organization is made up of talented, motivated people from diverse cultural, educational and professional backgrounds. We believe in teamwork, shared ideas, and creating solutions together while respecting individuality and innovation. We seek out people who want to see their ideas put into action, are committed to making a difference and who believe that more is possible!Â Who We AreHere, you will discover colleagues who have passion for our company, our community, customers and each other, and that are led by a team of outstanding people who believe that more is possible from each and every one of us.Â 
-    ## 2                                                                                                                                                                We build software for fashion retailers, to help them make the right commercial decisions about what to sell, and how to price it. Fashion is the 4th biggest industry in the world, so this is actually a huge problem economically, as well as environmentally for everyone in the world. The Guardian called us one of the 20 hottest London startups, and we're a quickly growing team, with a product used by some of the best retailers in the world, and we're backed by the smartest investors in Europe, the same ones who backed Etsy, Dropbox, ASOS and Net-a-Porter.
-    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       description
-    ## 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Communication Assistants provide communication access for deaf, hard of hearing, and speech impaired consumers through the telephone network by relaying telephone calls usingÂ voice and text.Accept and place local and long distance relay calls for consumers.Follow desired method of billing instructions and enter billing information into the system.Translate electronic messages to voice messages and voice messages to electronic messages.Translate sentence structures and language patterns from American Sign Language (ASL) to English and English to ASL to ensure the correct message is relayed.Convey the callers actual feelings and emotions.Relay contents of the call as accurately as possible without intervening in the conversation.Maintain strict consumer confidentiality and professionalism.Please note that we recruit for this position on an on-going basis in order to build a talent pool of potential candidates. When a position becomes available, we will review applicants at that time. Due to the volume of resumes that we receive, only those candidates selected for interviews will be contacted. Thank you for your interest in CSD!
-    ## 2 About EDITDEDITD is a retail technology company and runs the world's biggest apparel data warehouse. Â Global and local retailers use EDITD to make sure they have the right product, at the right price, at the right time. Â EDITD is a market leader, and is used by the worldâ\200\231s best fashion retailers, like Gap, ASOS and Target, across five continents.The JobIn this product specialist role you will be an integral part of the Customer Success team. You will be a customer success specialist - using your expert knowledge of the EDITD product to build and deliver best-in-class training to our high profile retail clients. If youâ\200\231re not an expert on EDITD already, donâ\200\231t worry, because weâ\200\231ll make you one.You will be a strong product advocate, and support each of our individual users to become as proficient in using the EDITD app as you are. You will also be a strong customer advocate - feeding back their views about the product to the relevant teams and helping to shape the development of the EDITD product. We expect you to be passionate about our customers, and be as excited about helping them to get the most value out of our of our product as we are.Our expectations for your position:Youâ\200\231re fanatical about supporting customers, take responsibility for them using and understanding the product, and have a personal connection to them.You can be a strong advocate for our productsYou have exceptional verbal and written communication skills and you are able to communicate across time zones and all types of people in all sorts of roles.You are tech savvy and able to communicate feedback and feature requests back to the product teams at EDITD.You are organised and meticulous about documenting processes.Youâ\200\231re able to articulate positioning, use cases and benefits.You are numerate, and data literate, and know how to identify trends in client usage and use these trends to build and deliver training to increase product adoption.You will build and deliver best in class training to our clients by understanding their job roles, client success measures, and adult learning best practices.You will build documentation and materials to support the training programs you create.You are able to identify client warning signs (both in-person, and via usage data) and communicate it with the Customer Success Manager.
-    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    We are seeking motivated individuals ready to install gutter protectors.Must have a good understanding of a home's exterior.Â We can train you to install in the field today!!You will start making money IMMEDIATELY.In order to qualify you need to have the following:- A good work truck.- A good set of tools.- A set of ladders in different lengths.- A professional demeanor.- Good communication skills.- We provide all materials!Training class start tomorrow...We offer full Medical, Vision and Dental benefits.***1099 contractor***We pay for hotels if travel is needed.We pay your mileage
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         requirements
-    ## 1                                                                                                                                                                                                                                                                                                                               A minimum of a High School Diploma or equivalent.At least 18 years of age or older.Typing skill of at least 50 WPM using a personal computer.Ability to work various schedules including weekdays, evening and weekends.Ability to learn ASL syntax.
-    ## 2 Minimum of 1+ year of training or account management experienceAn interest or background in fashion or retailing is a plus.Experience managing or training clients in Fortune 500 corporations.Proven success in growing existing accounts and relationships.Technical competence and enthusiasm (understanding of SaaS software or technology).Excellent written, communication, presentation skills.Works well with others. Â Loves being on a team.Independent Â â\200“ to take initiative, own processes, and work independently.Highly organized. Â Tenacity to finish projects.
-    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                benefits
-    ## 1 CSD offers a competitive benefits package for full-time employees. For a full list of benefits and perks, please visit theÂ career page.Communication Service for the Deaf, Inc. is anÂ Equal OpportunityÂ Affirmative Action Employer and drug free and tobacco free workplace. All qualified applicants will receive consideration for employment without regard to race, color, religion, sex, or national origin, including individuals with a disability and protected veterans.
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    ##   job_id
+    ## 1   7397
+    ## 2  13899
+    ## 3  15565
+    ##                                                                          title
+    ## 1                                                 Senior Lease Records Analyst
+    ## 2                                              Caregivers needed for Holidays!
+    ## 3 Marketing Intern with Vietnamese language skills - Paid Position (part-time)
+    ##   department
+    ## 1           
+    ## 2           
+    ## 3           
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 company_profile
+    ## 1 Valor Services provides Workforce Solutions that meet the needs of companies across the Private Sector, with a special focus on the Oil &amp; Gas Industry.Â Valor Services will be involved with you throughout every step of the hiring process and remain in contact with you all the way through the final step of signing of the employment contract with your new employer.Â Valor Services was founded with the vision of employing the unique skills, experiences, and qualities of Americaâ\200\231s finest veterans to provide Private Sector companies with precise and concerted value-added services â\200“ and Americaâ\200\231s finest Veterans with an optimized career opportunity.We are eager to get the word out to veterans that there are ample opportunities for employment in the private sector and that you are the ideal candidates to fill those positions.Â Valor ServicesÂ Your Success is Our Mission.Â â„¢Â 
+    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+    ## 3                                                                                                                                                                                                                                                                                                                                                                                          Fabrily makes it easy for campaigners/communities/charities/causes/artists. etcâ\200¦ to raise funds and awareness with custom merchandising (T-shirts, Hoodies, iPhone covers, etcâ\200¦) Users design a merchandise with Fabrilyâ\200\231s help and sell it to their network/community. Fabrily handles the printing and shipping and give the profits back to the sellers. It is absolutely free for the sellers to use.This 60 second video explains how it works â\200“ #URL_39f7a1fd2a9c4e06693f732e976b7ec6011a6484aa0363b7a85cf5f2968742d5#
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     description
+    ## 1                                                                                                                            This is an amazing opportunity to work with one of the most robust companies in the Oil &amp; Gas Industry.Â Opportunities for advancement are extensive as the company is currently in the process of expanding. Strong compensation and benefits packages are available for qualified candidates who want to join the largest player in the region.*This position will require relocation to Oklahoma.SUMMARYReview and analyze oil and gas leases and related exploration and production contracts to insure proper maintenance of these company assets. Enter data into the companyâ\200\231s lease and contract systems to accurately and timely maintain all contractual obligations. Maintain paper file records containing original leases, contracts, documents, maps, bonus and rental check receipts, and related correspondence.ESSENTIAL DUTIES AND RESPONSIBILITIESÂ Review and analyze leases and related documents acquired by district offices.Insure pertinent lease information is timely and accurately entered into companyâ\200\231s lease system.Established proper rental shut-in and minimum royalty payment records to maintain leases in force.Analyze correspondence and title change documents received from lesser and partners.Adjust records in lease maintenance system to reflect subsequent changes.Maintain accurate name and address data for lesser, payees, and partners.Review and initiate telephone and written contact with lesser, payees and partners.Insure pertinent contract information is timely and accurately entered into company contract system.Adjust records in contract maintenance system to reflect subsequent changes.Monitor drilling reports and well status notices received from districts.Review and update records affected by well completions or well status changes.Assist with research, special projects and other duties as required.
+    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Currently hiring per-diem caregivers to work on holidays. Shifts available include Thanksgiving, day after Thanksgiving, Christmas Eve, Christmas Day, New Years Eve and New Years Day.Â 
+    ## 3 Are you looking to join an exciting and high-growth startup? Are you up for a challenge? Do you enjoying working hard and making a dent in the universe? If you answered yes to these questions then please read onâ\200¦Fabrily is on the hunt for a brilliant marketing / business development intern to join our existing team. We are looking for someone who is energetic, intelligent and full of good ideas. We want someone to join our friendly and hardworking team to assist us in getting the word out about this new disruptive service. As we expand our services internationally, we are looking for an enthusiastic and driven person who can combine marketing research and business development skills to analyze and serve our growing Southeast Asian seller base. Â As this is a part-time position, you could also combine this with your studies. Â What is Fabrily?Fabrily is a startup that makes it easy for campaigners/communities/charities/causes/artists. etcâ\200¦ to raise funds and awareness with custom merchandising (T-shirts, Hoodies, tank tops, etcâ\200¦) Users design a merchandise with Fabrilyâ\200\231s help and sell it to their network/community. Fabrily handles the printing and shipping and give the profits back to the sellers. It is absolutely free for the sellers to use.This 60 second video explains how it works â\200“ #URL_850ac80fb1cdb4e0a89c79a9ce7a3d03c57c733c45af5bb20455dd30755cc8b3#Key ResponsibilitiesUndertaking market research, business development and marketing related activities to get new campaigners on boardInvestigating new types of audiences which might find Fabrily usefulLead generation â\200“ both online and offlineLiaising with potential campaigns to get them on boardNetworking in the community to get people excited about FabrilyWe have already seen an amazing take-up of the service and have big plans for the future.Â The internship will be part-time for a duration of 3 months with a potential full time job offer at the end.Â 
+    ##                                                                                                                                                                                                                                                                                                                                     requirements
+    ## 1 EDUCATION and EXPERIENCEBachelorâ\200\231s degree and eight (8) years of experience required. Â Must accurately perform basic math functions, exhibit proficiency in MS Word and Excel, and demonstrate ability to learn and use the company's current land system and other systems as needed in the performance of the functions of this position.
+    ## 2                                              In order to be eligible for this job, you must meet the following requirements:First Aid/CPRNegative TB testFingerprint Clearance Card or ability to pass background checkMinimum 6 months experience as a caregiverAbility to lift uo to 50 lbsPositive AttitudeCNA's Preferred but not required
+    ## 3                                                                         Self motivated, proactive, well organized and efficientShould take the initiative, pick things up and run with itGood networker with fluent English &amp; Vietnamese (additional languages a plus)Some experience with marketing and business development is desirable
+    ##                                                                                                                                                                                                                                                                                                                                                benefits
+    ## 1                                                                                                                                                                                                                                                                                                                                                      
+    ## 2                                                                                                                                                                                                                                                                                                                                                      
+    ## 3 Work as a paid intern in an exciting new startup (part-time or full-time)Be a part of taking a fast paced startup to the next levelLots of learning and networkingFlexibility to work remotely as and when neededInputs and involvement in other parts of the businessDevelop your own marketing ideas and implement themPossibility to work remotely
     ##   telecommuting has_company_logo has_questions employment_type
-    ## 1             0                1             1       Part-time
-    ## 2             0                1             1       Full-time
-    ## 3             0                0             0                
-    ##   required_experience        required_education
-    ## 1         Entry level High School or equivalent
-    ## 2                             Bachelor's Degree
-    ## 3                                              
-    ##                              industry        function. fraudulent country state
-    ## 1                  Telecommunications Customer Service          0      US    MN
-    ## 2 Information Technology and Services                           0      GB  <NA>
-    ## 3                                                               0      US    MN
-    ##           city min_salary max_salary
-    ## 1     Moorhead       <NA>       <NA>
-    ## 2       London       <NA>       <NA>
-    ## 3 MINNEAPOLIS        <NA>       <NA>
+    ## 1             0                1             1       Full-time
+    ## 2             0                0             1                
+    ## 3             0                1             1                
+    ##   required_experience required_education     industry function. fraudulent
+    ## 1                      Bachelor's Degree Oil & Energy                    0
+    ## 2                                                                        0
+    ## 3                                                                        0
+    ##   country state          city min_salary max_salary
+    ## 1      US    OK Oklahoma City       <NA>       <NA>
+    ## 2      US    AZ       Phoenix       <NA>       <NA>
+    ## 3      GB   LND        London       <NA>       <NA>
 
 ## Visualize missing rates for each feature
 
@@ -335,7 +373,7 @@ sample_n(missingdf, 3)
 gg_miss_var(df_fake_job, show_pct = TRUE) + labs(y = "% Missing")
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ## Merge columns and create a new ‘full_text’ column
 
@@ -362,24 +400,18 @@ viz_df[viz_df == ""] <- NA
 ## Visualize missing profile for each feature
 
 ``` r
-plot_intro(viz_df, title = "Data Quality")
-```
-
-![](project_fake_job_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
-``` r
 plot_missing(viz_df)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
-## Heatplot of missingness across the data frame
+## Heatplot of missingness across the dataframe
 
 ``` r
 vis_miss(viz_df)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ## Drop columns
 
@@ -401,13 +433,13 @@ sample_n(model_df, 3)
 ```
 
     ##   job_id telecommuting has_company_logo has_questions fraudulent
-    ## 1  16639             0                1             1          0
-    ## 2   7323             0                1             1          0
-    ## 3   7272             0                1             1          0
-    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   full_text
-    ## 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Immediate Opening : Help Desk /Technical Support Coordinator US Information Technology VAM SYSTEMSÂ is a Business Consulting, IT Solutions and ServicesÂ company with operations in UAE, Qatar, Bahrain, USA, Australia, Singapore &amp; India. . We offers a comprehensive list of services in the field of IT infrastructure management, Cloud services, IT Consulting Services, Banking, Management Resources, Information Technology Development, Telecom, Aviation, Retail Management &amp; Government offerings. Greetings from VAM SYSTEMSâ\200¦..VAM SYSTEMSÂ is a Business Consulting, IT Solutions and ServicesÂ company with operations in UAE, Qatar, Bahrain, USA, Australia, Singapore &amp; India. . We offers a comprehensive list of services in the field of IT infrastructure management, Cloud services, IT Consulting Services, Banking, Management Resources, Information Technology Development, Telecom, Aviation, Retail Management &amp; Government offerings.VAM SYSTEMS is currently looking for Help Desk / Technical Support Coordinator for our Qatar operations.Domain: Bank.Experience Required: 4 to 5Years.Terms and conditions:Â Joining time frame:Â Â  2 weeks (maximum 1 month).The selected candidates shall join VAM SYSTEMS â\200“ Qatar and shall be deputed to one of the leading banks in Qatar.Â Â Â Â Â Â Â Â Â Â  Skill Set required:Should have excellent communication skills, strong writing and reading skills, ability to work in and contribute to a team environmentShould have comprehensive knowledge of computer hardware and software with the strong troubleshooting ability.Should have experience in managing customer service request and mailboxes and assign tickets to technicians within theÂ team.ResponsibilitiesAssist technicians with first call resolution for desktop, laptop, and network connectivity problems.Attending the customer calls and queries, solving problems on primary level through telephone. Raising and Assigning cases for customers into the problem tracking system(E)Accepting calls, logging the calls, assigning the calls to the respective support engineer.Co-ordinate with the team.Coordinate and maintain a log sheet of request activities of the Help Desk, be able to prioritize service requests according to importance, i.e., emergency, immediate, high priority, moderate, general or suggestionReviews after hours Inbox mails and make sure the Engineers follow the Instruction as defined, if any deviation, notification to the concern engineer and keep him updated with process and procedure in line.Â       
-    ## 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        System Administrator US  EUROPEAN DYNAMICS (#URL_c66532ffa1ce76ab447da6774719060c42c584edbf44d74cdb94fc4ac219ca45#) is a leading European Software, Information and Communication Technologies company, operating internationally (Athens, Brussels, Luxembourg, Copenhagen, Berlin, Rome, Stockholm, London, Nicosia, Helsinki, Valetta, etc). The company employs over 600 engineers and IT experts. We design and develop software applications using integrated, state-of-the-art technology. Our current IT and telecoms projects have a value exceeding 250 million EURO. EUROPEAN DYNAMICS is a renowned supplier of IT services to European Union Institutions, international organizations, European Agencies and national government Administrations all over Europe. We currently have a vacancy for a System Architect, fluent in English, to offer his/her services as expert who will be based in Westminster, London, UK. The work will be carried out either in the companyâ\200\231s premises or on site at customer premises. In the context of the first assignment, the successful candidate will be integrated in the Testing team of the company that will closely cooperate with a major clientâ\200\231s IT team on site.Your tasks:Build and maintain appropriate environments for testing and development work;Identify the role of technology in service delivery and policy implementation;Revise and improve the development toolset as the work progresses;Configure and manage Linux servers for serving a dynamic website, debug complex multi-server services;Bring innovation in managing and improving the development tool set. Your skills:University degree with demonstrated experience in system administration and web operations;Excellent knowledge of Mongo database and JAVA;Good knowledge of Dropwizard, Mustache templates, Javascript, Git, Jenkins, Cucumber, HTML and CSS;Hands on experience with Linux servers;Understanding of common web application architecture;Working experience in development (preferably in Java) will be considered as an asset;Fluency in both oral and written English. Trident has offices across the country and customers in both federal and commercial markets. We provide cutting-edge technology solutions in some of the most demanding environments in the world.Â  Trident offers a fast-paced, team-oriented work environment with an exceptional compensation &amp; benefits package including:Competitive Base PayPPO Medical&amp; Dental, 80% employer paidLife, &amp; AD&amp;D, Short Term &amp; Long Term Disability, 100% employer paidCompetitive Simplified Employee Pension (SEP) retirement savings account10 paid floating holidays20 Day Paid Time Off (PTO) to start5 days paid Maternity/Paternity leavePaid Military LeaveProfit Sharing &amp; Performance BonusesFlexible Work SchedulesGrowth Opportunities &amp; Much More!EEO Statement: Â All qualified applicants will receive consideration for employment and will not be discriminated against on the basis of disability.Â  Trident Systems Incorporated is an Equal Opportunity Employer of protected Veterans and a VEVRAA Federal Contractor. Trident Systems has a desire for priority referrals of protected Veterans. #URL_693114d52e87417a7e014ac3d04653a6664f919ad6a6f8de149affcfc8f083cc#. Full-time Mid-Senior level Bachelor's Degree Computer Software Information Technology
-    ## 3 Guest Services - Team Lead  US  Airenvyâ\200\231s mission is to provide lucrative yet hassle free full service short term property management all around the world. We combine the charm of your home with the amenities of a boutique hotel.Currently the short-term rental property management companies are run inefficiently thus having to charge owners 40-50% of monthly revenues. By using our pricing algorithm cross-platform listing technology out goal is to increase your rental income by 20% or more while only charging you a 12%-15% commission for providing a turnkey experience.We like to think Airenvy is creating a new way for people to become excited again about property management and love their property managers.First use case for Airenvy clients are those who want to convert their long-term rental into short-term rental so they can 1) earn more income while having the flexibility of staying in your own place when you want.Airenvy is your friend next door! : ) Our customer video!Â #URL_e73543fde61f659ae4e25b87c34adb321c37207b4adc143cb6a99351c3ee1cb5# Who is Airenvy?Hey there! We are seasoned entrepreneurs in the heart of San Franciscoâ\200\231s SOMA neighborhood. Â We are looking for someone who embodies an entrepreneurial spirit, pays strong attention to detail and wants to be a part of the next big thing. This business can feel like a circus at times, but we have an all-star team with a one of a kind culture. Â Get a little taste of it here.Airenvy is the #1 technology driven property management company in aÂ multi-billion dollar industryÂ and is revolutionizing the vacation rental space! We are growing at record speed and expanding to new markets! Our platform allows owners to put their vacation rental on autopilot. We are a proven team of startup veterans and would love for you to join theÂ family! Â  Â In 2014 we were named the #1 Airbnb property management company in San Francisco according to theÂ SF Chronicle. We have 18 supportive and resourceful investors, many of whom are leaders in the technology and real estate industries.The PositionAirenvy is growing faster than we can handle, and now Â weâ\200\231re looking for someone to help us scale! We are seeking an amazing contact center lead who is passionate about getting results and creating a team that can weather any storm. Youâ\200\231ll play a direct role in improving and growing the current Guest Services team, scaling the business, and creating best practices and processes that allow for Airenvy to exist anywhere!ResponsibilitiesDrives continuous agent improvement to achieve both customer satisfaction and Airenvyâ\200\231s goals.Ensures successful execution of Airenvyâ\200\231s Guest services by managing day-to-day operations of the contact center (outsource) team.Understands the customerâ\200\231s needs, service requirements, and execution expectations.Handles non-urgent issue escalations.Functions as a liaison to Guest Services agents leveraging a strong understanding of the customers challenges, and available best practices.Helps agents evolve to a smart, predictive and proactive service operational model based on best practices, skills, services, and tools.Collaborates with management to maximize the contact center team value through continual improvements in operation team members, processes, and tools.Perform duties as assigned by management.You?Phenomenal coaching skills - proven inspirational leadership.Pro-active, enthusiastic and motivating Leader.Comfortable navigating complex systems.Strong communication and analytical skills.Disciplined with an entrepreneurial spirit (able to work independently).Customer centric approach.Ability to effectively communicate with upper management about complex issue.Team player, with a genuine interest and proven talent for coaching and developing others. Previous contact center/call center experienceMinimum four years in customer service management role (please do not apply unless youâ\200\231ve managed a minimum of ten direct reports).Bachelorâ\200\231s degree focus in management, business, or an analytical discipline.Advanced English writing and speaking skills, any additional language is a strong plus.Ability to work well under pressure especially in a changing environment.Zendesk experience is a plusExperience in hotel/travel industry is a plus. Very competitive salary depending on skill level and experience.As this is very much a â\200œstart-up environmentâ\200\235, it provides an opportunity for successful applicants to be more directly involved in the general shaping and direction of the AWS infrastructure of the company, toÂ experience a well-structured agile development environment, pick up some useful general business skills and to interact with end-users directly.
+    ## 1   4652             0                0             0          0
+    ## 2   8546             0                1             1          0
+    ## 3   9746             0                1             1          0
+    ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            full_text
+    ## 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              DRIVER  US   CLASS 5Â  VALID LICENCE TO DRIVE MINI VANÂ  FOR OUT OF TOWN PROJECTS IN ALBERTAÂ . ONE TO TWO NIGHTS STAY , HOTEL /FOOD BY COMPANY, LIGHT WORK. Â HELPER TO ENGINEER. APPLY CASH OR PAYROLL $15/HR. CALL VIJAY AT #PHONE_776f65d507216da693f53f58ad2c04e5cf609dee342af8f736a56bd37f01d5c5#Â  STARTING TOMORROW.Â        
+    ## 2 Marketing Associate US Marketing The smarter way to investPicking from thousands of stocks or funds is hard. Finding an investment manager can be even harder. Weâ\200\231ve built a smarter way for savvy investors to find managers they can trust.We believe investing should be transparent, fair, and a pleasure, not a chore.Our investorsThe companyâ\200\231s investors include Union Square Ventures, Spark Capital and Amadeus Capital Partners.Learn more on #URL_e69aa09a90250fdf472550ec4ae5a6795a6f09d317f44b9beda100daf3203e0b# Covestor is seeking a talented,Â hands-on individual to join our relationship marketing and digital client acquisition team. Solid knowledge of how to engage prospects online, exceptional copywriting and mastery of HubSpot is required. The position reports to the Chief Marketing Officer.Your background should demonstrate proven success in creating and delivering high-impact consumer marketing programs. The ideal candidate will have experience with the nuts and bolts of online marketing and experience with customer acquisition. Experience in asset management or wealth management is a preferred. You should be comfortable in a fluid start-up environment and bring an energetic, fun and creative approach to your work.This job will be based in our US headquarters in downtown Boston.The role:Develop marketing campaigns, content marketing plans, website calls-to-action and other relationship formation marketing programs to drive new leads and clients.Produce compelling content that attracts and engages new clients to Covestor. Programs focus on the topical concerns of affluent and high net worth investors.Own and evolve our HubSpot programEvolve the retention and development marketing programs targeted at Covestor clients.Develop marketing programs that re-engage older prospects. To succeed, youâ\200\231ll needâ\200¦Very strong organizational, writing and communication skillsCreative flair and willingness to experimentEfficient digital worker chops5+ years of relevant experience developing consumer marketing programs in an online environment and/or ad agencyExperience with managing and evolving HubSpot implementationExperience with content marketing and email marketingComfortable in a small, intense and high-growth start-up environmentTo apply, please send(1) a cover email of two or three paragraphs describing the reason for your interest in both this position and in joining Covestor,(2) links to your recent writing and web presence Friendly atmosphereHighly competitive salarySolve concrete problems by creating tools that will be immediately usedOpportunity for self-improvement and growth Full-time Associate Bachelor's Degree Financial Services Marketing
+    ## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           English Teacher Abroad  US  We help teachers get safe &amp; secure jobs abroad :) Play with kids, get paid for itÂ Love travel? Jobs in Asia$1,500+ USD monthly ($200 Cost of living)Housing provided (Private/Furnished)Airfare ReimbursedExcellent for student loans/credit cardsGabriel Adkins : #URL_ed9094c60184b8a4975333957f05be37e69d3cdb68decc9dd9a4242733cfd7f7##URL_75db76d58f7994c7db24e8998c2fc953ab9a20ea9ac948b217693963f78d2e6b#12 month contract : Apply todayÂ  University degree required.Â TEFL / TESOL / CELTA or teaching experience preferred but not necessaryCanada/US passport holders only  Contract  Bachelor's Degree Education Management
 
 ``` r
 # write.csv(model_df, "C:/Users/munmu/Documents/GitHub/fake_job_posting\\model_df.csv", row.names = FALSE)
@@ -433,13 +465,13 @@ sum(model_df == "")
 vis_miss(model_df)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 vis_dat(model_df)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 # Exploratory Data Analysis (EDA)
 
@@ -461,10 +493,11 @@ bar <- barplot(count,
 text(bar, count/2, labels = count)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 It is observable that there are 17,014 cases of legitimate job postings,
-while the number of fraudulent job postings is 866.
+while the number of fraudulent job postings is 866. The fraud rate of
+this dataset is 4.84%.
 
 ## Visualize country-wise job postings
 
@@ -494,7 +527,11 @@ barplot(height=temp$n,
         las=2)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+Top 10 countries with most of the number of job postings are US, GB, GR,
+CA, DE, NZ, IN, AU, PH, NL. United States listed 10,656 job postings,
+followed by 2,384 for United Kingdom and 940 for Greece.
 
 ## Visualize the industries
 
@@ -515,7 +552,10 @@ barplot(height=temp$n,
         las=2)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+Most job openings are IT related such as Information Technology and
+Services (1,734), Computer Software (1,376) and Internet (1,062).
 
 ## Visualize the departments
 
@@ -536,7 +576,10 @@ barplot(height=temp$n,
         las=2)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+Top hiring departments are Sales (551), Engineering (487) and Marketing
+(401).
 
 ## Visualize the required experiences in the jobs
 
@@ -560,7 +603,10 @@ viz_df %>% group_by(required_experience) %>%
   geom_text(aes(label=round(n,0)), vjust=-0.6)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+Mid-Senior level jobs are in demand, followed by entry level and
+associate.
 
 ## Visualize the required education in the jobs
 
@@ -584,7 +630,10 @@ viz_df %>% group_by(required_education) %>%
   geom_text(aes(label=round(n,0)), vjust=-0.6)
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+
+Most of the education requirements in job ads are at least Bachelor’s
+degree.
 
 ## Visualize fraudulent job postings based on employment types
 
@@ -610,7 +659,7 @@ df_new <- merge(df1, df2, by = c("employment_type")) %>%
                                              'Full-time',
                                              'Contract',
                                              'Temporary')))
-fig <- df_new %>% plot_ly()
+fig <- df_new %>% plot_ly(width = 700, height = 400)
 fig <- fig %>% add_trace(x = ~employment_type, y = ~pct_non_fraud, type = 'bar', 
              text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
@@ -626,7 +675,11 @@ fig <- fig %>% layout(title = "Employment types with % fraud and non-fraud",
 fig
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+
+The percentage of fraudulent job postings is the highest for part-time
+jobs, nearly 9%. Jobs without an employment type also have a high fraud
+rate, around 7%.
 
 ## Visualize fraudulent job postings based on required experiences
 
@@ -653,7 +706,7 @@ df_new <- merge(df1, df2, by = c("required_experience")) %>%
                                                  'Mid-Senior level',
                                                  'Internship',
                                                  'Associate')))
-fig <- df_new %>% plot_ly()
+fig <- df_new %>% plot_ly(width = 700, height = 400)
 fig <- fig %>% add_trace(x = ~required_experience, y = ~pct_non_fraud, type = 'bar', 
              text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
@@ -669,7 +722,10 @@ fig <- fig %>% layout(title = "Required experiences with % fraud and non-fraud",
 fig
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+
+Most executive or entry level jobs that require minimum qualifications
+and little experience have highest fraud rate, nearly 7%.
 
 ## Visualize fraudulent job postings based on job functions
 
@@ -711,7 +767,12 @@ ggplot(melted_temp, aes(x = function., y = value, fill = variable)) +
   ylab("percentage")
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+
+The function with highest fraudulent job postings is Administrative,
+close to 19%, followed by Financial Analyst, Accounting/Auditing. Admin
+jobs seem most suspicious. Possibly, it’s easy for scammers to disguise
+their scams.
 
 ## Visualize fraudulent job postings based on required education
 
@@ -750,9 +811,19 @@ ggplot(melted_temp, aes(x = required_education, y = value, fill = variable)) +
   ylab("percentage")
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
-## Word cloud of fraudulent job postings
+As high as 74% of fake jobs require little educational credentials -
+“Some High School Coursework”.
+
+## Word Cloud
+
+To visualize the fraud and real job postings, the WordCloud is used to
+see the top occurring keywords in the data. To do so, fraud and real job
+postings are separated into two text files and WordCloud has plotted
+accordingly.
+
+## Word Cloud of fraudulent job postings
 
 ``` r
 selected_df <- subset(viz_df, fraudulent == 1)
@@ -770,19 +841,20 @@ docs <- docs %>%
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-dtm <- TermDocumentMatrix(docs) 
-matrix <- as.matrix(dtm) 
-words <- sort(rowSums(matrix), decreasing=TRUE) 
+dtm <- TermDocumentMatrix(docs)
+matrix <- as.matrix(dtm)
+words <- sort(rowSums(matrix), decreasing=TRUE)
 df <- data.frame(word = names(words), freq=words)
 
-my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
-saveWidget(my_graph, "wordcloud_fraud.html", selfcontained = F)
-my_graph
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words = 200, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
-## Word cloud of non-fraudulent job postings
+Many of the fraudulent job postings have common keywords in the job
+titles - “Data Entry”, “Administrative”, “Home Based”, “Earn Daily”.
+
+## Word Cloud of NON-fraudulent job postings
 
 ``` r
 selected_df <- subset(viz_df, fraudulent == 0)
@@ -800,139 +872,557 @@ docs <- docs %>%
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-dtm <- TermDocumentMatrix(docs) 
-matrix <- as.matrix(dtm) 
-words <- sort(rowSums(matrix), decreasing=TRUE) 
+dtm <- TermDocumentMatrix(docs)
+matrix <- as.matrix(dtm)
+words <- sort(rowSums(matrix), decreasing=TRUE)
 df <- data.frame(word = names(words), freq=words)
 
-my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
-saveWidget(my_graph, "wordcloud_real.html", selfcontained = F)
-my_graph
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words = 200, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
 ```
 
-![](project_fake_job_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](project_fake_job_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+
+Many of the NON-fraudulent job postings have common keywords in the job
+titles - “Manager”, “Developer”, “Engineer”.
 
 # Modeling
 
-## Regression
-```{r}
-#Converting continuous variables into binary variables
-model_df$job_id <- as.factor(ifelse(model_df$job_id > median(model_df$job_id), 1, 0))
+Before modeling, a final dataset is determined. This project will use a
+dataset with these features for the final analysis:
+
+-   fraudulent (target variable)
+-   telecommuting
+-   has_company_logo
+-   has_questions
+-   full_text: a combination of title, country, department,
+    company_profile, description, requirements, benefits,
+    employment_type, required_experience, required_education, industry
+    and function
+
+Three supervised machine learning algorithms used in the project are:
+
+-   Logistic Regression
+-   Random Forest
+-   K-Nearest Neighbor (KNN)
+
+``` r
+model_df <- subset(model_df, select = -c(job_id))
+names(model_df)
 ```
 
+    ## [1] "telecommuting"    "has_company_logo" "has_questions"    "fraudulent"      
+    ## [5] "full_text"
 
-```{r}
-#View the number of two variable categories
-summary(model_df$job_id)
+## Data pre-process (full_text)
+
+For this analysis, the entire full_text column is converted to a
+DocumentTermMatrix and then convert to a dataframe.
+
+``` r
+# temp <- subset(model_df, fraudulent == 1)
+docs <- Corpus(VectorSource(model_df$full_text))
+docs <- docs %>%
+  tm_map(removeNumbers) %>% # Remove numbers
+  tm_map(removePunctuation) %>% # Remove punctuation
+  tm_map(stripWhitespace) # Eliminate extra white spaces
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeWords, stopwords("english"))
+
+# Convert each full_text into a row with columns containing each term in the document and giving the frequency of unique words used in the full_text
+dtm <- DocumentTermMatrix(docs)
+sparse_data <- removeSparseTerms(dtm, 0.90) # Remove sparse data
 ```
-#Visualizing Data
-```{r}
-par(mfrow=c(2,5))
-for(i in 2:5) {
-    hist(model_df[,i], main=names(model_df)[i])
+
+``` r
+# Convert to dataframe for further analysis
+sparse_data_df <- as.data.frame(as.matrix(sparse_data))
+final_df <- subset(sparse_data_df, select = -c(`–`))
+
+# Add other variables
+final_df$telecommuting <- model_df$telecommuting
+final_df$has_company_logo <- model_df$has_company_logo
+final_df$has_questions <- model_df$has_questions
+final_df$fraudulent <- model_df$fraudulent
+```
+
+## View the dimension of the dataframe
+
+``` r
+dim(final_df)
+```
+
+    ## [1] 17880   313
+
+``` r
+# 17880 rows, 313 columns
+```
+
+## Visualize data
+
+``` r
+# Histogram
+par(mfrow=c(2,2))
+for(i in 310:313) {
+    hist(final_df[,i], main=names(final_df)[i], border="blue", col="yellow")
 }
 ```
-```{r}
-par(mfrow=c(1,5))
-for(i in 1:5) {
-    boxplot(model_df[,i], main=names(model_df)[i])
+
+![](project_fake_job_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+
+``` r
+# Boxplot
+par(mfrow=c(2,2))
+for(i in 310:313) {
+    boxplot(final_df[,i], main=names(final_df)[i], border="blue", col="yellow")
 }
 ```
-```{r}
-#Calculate the correlation between each pair of numeric variables
-library(corrplot)
-correlations <- cor(model_df[,2:5])
+
+![](project_fake_job_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+
+## Correlation
+
+A correlation matrix is created to visualize the numeric data
+relationship.
+
+``` r
+# Calculate the correlation between each pair of numeric variables
+correlations <- cor(final_df[, 310:313])
 corrplot(correlations, method="circle")
 ```
 
-```{r}
-# Using the same seed value, reproduce the division of the training set and the test set
-set.seed(2021)
-train_index <- sample(dim(model_df)[1], 0.7 * dim(model_df)[1])
-model_dftrain<- model_df[train_index, ]
-model_dftest <- model_df[-train_index, ]
+![](project_fake_job_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+
+has_company_logo and has_questions seem to have negative correlation
+with fraudulent. If the job posting has company logo or with questions,
+the likelihood of fraudulent decreases.
+
+## Split data into 70% training, 30% testing
+
+``` r
+# Using the same seed value, reproduce the division of the training and testing sets
+set.seed(123)
+train_index <- sample(dim(final_df)[1], 0.7 * dim(final_df)[1])
+model_dftrain<- final_df[train_index, ]
+model_dftest <- final_df[-train_index, ]
 paste("train sample size: ", dim(model_dftrain)[1])
+```
+
+    ## [1] "train sample size:  12516"
+
+``` r
 paste("test sample size: ", dim(model_dftest)[1])
 ```
-```{r}
-#Introducing AUC calculation function
-library("ROCR")
+
+    ## [1] "test sample size:  5364"
+
+## View training set
+
+``` r
+sample_n(model_dftrain, 3)
+```
+
+    ##       also amp andor around attention best big business communication company
+    ## 17169    0   0     0      0         0    1   0        0             0       0
+    ## 3482     0   0     0      0         0    0   0        1             0       0
+    ## 9043     1   0     0      0         0    0   0        0             1       1
+    ##       content currently daily drive engineering existing experience full highly
+    ## 17169       0         0     0     0           0        0          0    0      0
+    ## 3482        0         0     0     0           1        1          2    0      0
+    ## 9043        0         0     0     0           0        0          0    0      0
+    ##       hours information like long management market marketing media need new
+    ## 17169     0           1    0    0          1      0         0     0    0   0
+    ## 3482      0           2    1    0          0      0         0     0    0   1
+    ## 9043      0           0    0    1          1      0         0     0    0   2
+    ##       offer office one online people plus small social staff startup support
+    ## 17169     0      0   0      0      0    0     0      0     0       0       0
+    ## 3482      0      0   1      0      0    0     0      0     0       0       0
+    ## 9043      1      1   0      0      0    0     0      0     0       0       0
+    ##       systems talented team technology top using various website work working
+    ## 17169       0        0    1          1   0     0       1       0    0       0
+    ## 3482        0        0    2          3   0     1       0       0    0       1
+    ## 9043        0        0    0          0   0     0       2       0    1       0
+    ##       able apply based can candidates client clients communicate companies
+    ## 17169    0     0     0   0          0      0       0           0         0
+    ## 3482     0     0     0   0          0      0       0           0         0
+    ## 9043     0     0     0   0          0      0       0           0         0
+    ##       computer cost creative customer delivery effectively email environment
+    ## 17169        0    0        0        0        0           0     0           0
+    ## 3482         2    0        0        0        0           0     0           0
+    ## 9043         0    0        0        1        0           1     0           0
+    ##       every excellent fast following fulltime get global great grow growing
+    ## 17169     0         0    0         0        1   0      0     0    0       0
+    ## 3482      0         0    0         0        1   0      0     0    0       0
+    ## 9043      0         0    0         0        2   0      0     0    0       1
+    ##       growth high include including international issues key know knowledge
+    ## 17169      0    0       0         0             0      0   0    0         0
+    ## 3482       0    2       0         0             0      0   0    0         0
+    ## 9043       0    0       0         1             0      0   0    0         1
+    ##       large learn level looking making manage manager managing network
+    ## 17169     0     0     1       0      0      0       0        0       0
+    ## 3482      0     0     0       0      0      0       0        0       0
+    ## 9043      0     0     0       0      0      0       0        1       0
+    ##       opportunity part passion person phone planning platform please position
+    ## 17169           0    0       0      0     0        0        0      0        1
+    ## 3482            2    1       0      0     0        0        0      0        0
+    ## 9043            0    0       0      0     0        0        0      0        0
+    ##       process product production project projects provides quality range right
+    ## 17169       0       1          0       0        0        0       0     0     0
+    ## 3482        0       0          0       0        0        0       2     0     0
+    ## 9043        0       2          0       0        0        0       0     0     0
+    ##       role service skills software success successful system teams understand
+    ## 17169    0       0      0        1       0          0      0     0          0
+    ## 3482     0       0      0        3       0          0      0     1          1
+    ## 9043     0       2      1        0       0          1      0     0          0
+    ##       web will world across activities candidate career contract engineer
+    ## 17169   0    1     0      0          0         0      1        0        0
+    ## 3482    2    1     0      0          0         0      0        0        0
+    ## 9043    1    0     0      0          0         0      0        0        0
+    ##       ensure experienced field focus health ideal meet must needs opportunities
+    ## 17169      1           0     0     0      0     1    0    0     0             0
+    ## 3482       0           0     0     0      0     0    0    0     0             0
+    ## 9043       0           0     0     0      3     0    0    0     1             0
+    ##       per provide requirements resources seeking services solutions strong
+    ## 17169   0       0            0         0       0        0         2      0
+    ## 3482    0       0            0         0       0        1         5      0
+    ## 9043    0       0            1         0       0        1         0      0
+    ##       unique vision way ability analysis available bachelors benefits build
+    ## 17169      0      0   0       0        0         0         1        0     0
+    ## 3482       0      0   0       0        0         0         1        0     1
+    ## 9043       0      1   0       1        1         0         0        1     0
+    ##       competitive culture customers degree develop development equivalent first
+    ## 17169           0       0         0      1       0           2          0     0
+    ## 3482            0       0         0      2       1           3          0     0
+    ## 9043            1       0         0      1       0           0          0     0
+    ##       goals good help industry lead life maintain make midsenior motivated
+    ## 17169     0    0    0        0    0    0        0    0         1         0
+    ## 3482      0    0    0        1    0    1        0    0         0         0
+    ## 9043      0    0    0        0    0    1        0    0         0         0
+    ##       order organization personal problem professional providing related
+    ## 17169     0            0        0       0            0         0       0
+    ## 3482      0            0        0       0            0         0       0
+    ## 9043      0            0        0       0            0         0       1
+    ##       responsible sales strategy travel understanding value verbal within
+    ## 17169           0     0        0      1             0     0      0      0
+    ## 3482            0     0        0      0             0     0      0      0
+    ## 9043            0     1        0      0             0     0      0      1
+    ##       written year years care current deliver directly innovative interested
+    ## 17169       0    0     0    0       0       0        0          0          0
+    ## 3482        0    0     1    0       0       2        0          1          0
+    ## 9043        0    1     1    2       0       0        0          0          0
+    ##       job leadership monthly offers open operations performance positions
+    ## 17169   0          0       0      0    0          0           0         0
+    ## 3482    0          0       0      0    0          0           0         0
+    ## 9043    0          0       0      1    1          0           0         0
+    ##       potential preferred processes reports results standards time training
+    ## 17169         0         0         1       0       0         0    1        0
+    ## 3482          0         0         0       0       0         0    0        0
+    ## 9043          0         0         0       0       0         0    3        0
+    ##       well areas come design driven employees excel financial join relevant
+    ## 17169    1     0    0      1      0         0     0         0    0        0
+    ## 3482     0     0    0      0      0         0     0         0    0        0
+    ## 9043     0     0    0      0      0         1     0         0    0        1
+    ##       school senior technical we’re without brand dynamic ideas leading many
+    ## 17169      0      1         0     0       0     0       0     0       0    0
+    ## 3482       0      0         0     1       0     0       1     0       0    0
+    ## 9043       0      0         0     0       0     0       0     0       0    1
+    ##       mobile take creating flexible free just love minimum mission multiple
+    ## 17169      0    0        0        0    0    0    0       0       0        0
+    ## 3482       0    0        0        0    0    0    0       0       0        0
+    ## 9043       0    0        0        1    0    0    0       0       0        1
+    ##       passionate play record required use want applications associate change
+    ## 17169          0    0      0        0   0    0            0         0      0
+    ## 3482           0    1      0        0   0    0            3         0      0
+    ## 9043           1    0      0        0   0    0            0         1      0
+    ##       tools background delivering duties entry improve months reporting tasks
+    ## 17169     0          0          0      0     0       1      0         0     0
+    ## 3482      0          0          0      0     0       0      0         0     0
+    ## 9043      0          0          0      1     1       0      0         0     1
+    ##       agency building data developer developing digital internal learning
+    ## 17169      0        0    0         2          0       0        0        0
+    ## 3482       0        0    0         1          2       0        0        0
+    ## 9043       0        0    1         0          0       0        0        0
+    ##       products technologies closely employee internet start track application
+    ## 17169        0            0       0        0        0     0     0           0
+    ## 3482         1            0       0        0        0     0     0           2
+    ## 9043         2            0       0        0        0     0     0           0
+    ##       create established may user hard insurance believe now plan problems
+    ## 17169      0           0   0    0    1         0       0   0    0        0
+    ## 3482       1           0   0    0    0         0       0   0    0        0
+    ## 9043       0           2   0    0    0         2       0   1    1        0
+    ##       complex day education individuals relationships jobs fun see english
+    ## 17169       0   0         0           0             0    0   0   0       0
+    ## 3482        0   0         0           0             0    0   0   0       0
+    ## 9043        0   0         2           0             0    0   0   0       0
+    ##       individual salary dental group package paid medical exciting members
+    ## 17169          0      0      0     0       0    0       0        0       1
+    ## 3482           0      0      0     0       0    0       0        0       0
+    ## 9043           0      0      1     0       1    1      12        0       1
+    ##       least telecommuting has_company_logo has_questions fraudulent
+    ## 17169     0             0                1             1          0
+    ## 3482      1             0                1             1          0
+    ## 9043      0             0                1             0          0
+
+## Convert the dependent variable as a factor
+
+``` r
+model_dftrain$fraudulent = as.factor(model_dftrain$fraudulent)
+model_dftest$fraudulent = as.factor(model_dftest$fraudulent)
+```
+
+## Logistic Regression
+
+``` r
+# Train logistic regression
+lr_model <- glm(formula = fraudulent ~ ., family = "binomial", data = model_dftrain)
+```
+
+### Predict the testing set
+
+``` r
+lr_pred_test <- predict(lr_model, newdata = model_dftest, type = "response")
+```
+
+``` r
+test <- model_dftest
+glm.probs = predict(lr_model, newdata = test, type = "response")
+test$pred_glm = ifelse(glm.probs > 0.5, "1", "0")
+test$pred_glm = as.factor(test$pred_glm)
+```
+
+### Calculate AUC of the model
+
+``` r
 calcAUC <- function(predcol, outcol) {
-  perf <- performance(prediction(predcol, outcol == 1), "auc")
+  perf <- performance(prediction(as.numeric(predcol), outcol == 1), "auc")
   as.numeric(perf@y.values)
+}
+
+paste("AUC of Logistic Regression is", round(calcAUC(lr_pred_test, model_dftest$fraudulent), digits=4))
+```
+
+    ## [1] "AUC of Logistic Regression is 0.953"
+
+## Random Forest
+
+``` r
+# Train random forest
+trcontrol <- trainControl(method = "repeatedcv", number = 2, repeats = 1, search = "random", verboseIter = TRUE)
+grid <- data.frame(mtry = c(100))
+rf_model <- train(fraudulent ~ ., method = "rf", data = model_dftrain, ntree = 200, trControl = trcontrol, tuneGrid = grid)
+```
+
+    ## + Fold1.Rep1: mtry=100 
+    ## - Fold1.Rep1: mtry=100 
+    ## + Fold2.Rep1: mtry=100 
+    ## - Fold2.Rep1: mtry=100 
+    ## Aggregating results
+    ## Fitting final model on full training set
+
+``` r
+rf_model
+```
+
+    ## Random Forest 
+    ## 
+    ## 12516 samples
+    ##   312 predictor
+    ##     2 classes: '0', '1' 
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (2 fold, repeated 1 times) 
+    ## Summary of sample sizes: 6258, 6258 
+    ## Resampling results:
+    ## 
+    ##   Accuracy   Kappa    
+    ##   0.9691595  0.5253441
+    ## 
+    ## Tuning parameter 'mtry' was held constant at a value of 100
+
+### Predict the testing set
+
+``` r
+rf_pred_test <- predict(rf_model, newdata = model_dftest)
+```
+
+### Calculate AUC of the model
+
+``` r
+paste("AUC of Random Forest is", round(calcAUC(rf_pred_test, model_dftest$fraudulent), digits=4))
+```
+
+    ## [1] "AUC of Random Forest is 0.8028"
+
+## K-Nearest Neighbor (KNN)
+
+``` r
+# Train knn
+knn <- kknn(fraudulent ~ ., model_dftrain, model_dftest, k = 25)
+# View(knn)
+```
+
+### Predict the testing set
+
+``` r
+knn_pred_test <- predict(knn, newdata = model_dftest)
+```
+
+### Calculate AUC of the model
+
+``` r
+paste("AUC of KNN is", round(calcAUC(knn_pred_test, model_dftest$fraudulent), digits=4))
+```
+
+    ## [1] "AUC of KNN is 0.767"
+
+# Evaluation
+
+Accuracy and area under the curve (AUC) are used to evaluate the
+effectiveness of models in terms of classifying real and fake job
+postings. However, the dataset used for training is highly imbalanced.
+Thus, it is necessary to use F1 scores, precision, and recall to
+evaluate the model’s ability to identify both real and fake job
+postings.
+
+-   Accuracy score: Metric that provides a general idea of the model
+    performance.
+-   AUC score: Measure how well the model can distinguish real and fake
+    job postings.
+-   Precision score: Percentage of positive predictions are accurate.
+-   Recall score: Percentage of positive results that have been
+    classified correctly by the model.
+-   F1 score: Harmonic mean of precision and recall.
+
+``` r
+# Error Metrics -- Confusion Matrix
+err_metric=function(CM)
+{
+  TN = CM[1,1]
+  TP = CM[2,2]
+  FP = CM[1,2]
+  FN = CM[2,1]
+  precision = (TP)/(TP+FP)
+  recall_score = (FP)/(FP+TN)
+  
+  f1_score = 2*((precision*recall_score)/(precision+recall_score))
+  accuracy_model = (TP+TN)/(TP+TN+FP+FN)
+  False_positive_rate = (FP)/(FP+TN)
+  False_negative_rate = (FN)/(FN+TP)
+  
+  print(paste("Precision value of the model: ", round(precision,2)))
+  print(paste("Accuracy of the model: ", round(accuracy_model,2)))
+  print(paste("Recall value of the model: ", round(recall_score,2)))
+  print(paste("False Positive rate of the model: ", round(False_positive_rate,2)))
+  print(paste("False Negative rate of the model: ", round(False_negative_rate,2)))
+  print(paste("f1 score of the model: ", round(f1_score,2)))
 }
 ```
 
+## Confusion Matrix and Error Metrics of Logistic Regression
 
-```{r}
-# Logistics Regression
-lr_model <- glm(formula = job_id ~ has_company_logo + has_questions + fraudulent+has_company_logo, family = "binomial",     data = model_df)
-summary(lr_model)
-```
-```{r}
-# Predict the train set and test set respectively
-lr_pred_train <- predict(lr_model, newdata = model_dftrain, type = "response")
-lr_pred_test <- predict(lr_model, newdata = model_dftest, type = "response")
-```
-```{r}
-#Fitting the train data of the model for prediction
-glm.probs <- predict(lr_model,type = "response")
-glm.probs[1:5]
-glm.pred <- ifelse(glm.probs > 0.5, "Ture", "FALSE")
+``` r
+confMatrix_lr = table(test$pred_glm, test$fraudulent)
+print(confMatrix_lr)
 ```
 
-```{r}
-# Calculate AUC of train set and test set
-calcAUC(lr_pred_train, model_dftrain$job_id)
-calcAUC(lr_pred_test,  model_dftest$job_id)
+    ##    
+    ##        0    1
+    ##   0 5025  114
+    ##   1   67  158
 
-```
-## Classification
-
-```{r}
-# Import package
-# Import random forest package
-library(randomForest)
+``` r
+err_metric(confMatrix_lr)
 ```
 
-```{r}
-# Random forest model
-rf_model <- randomForest(job_id ~ has_company_logo + has_questions + fraudulent,model_dftrain, nodesize = 10, importance = T)
-# Demonstrate the importance of model variables
-importance(rf_model)
+    ## [1] "Precision value of the model:  0.58"
+    ## [1] "Accuracy of the model:  0.97"
+    ## [1] "Recall value of the model:  0.02"
+    ## [1] "False Positive rate of the model:  0.02"
+    ## [1] "False Negative rate of the model:  0.3"
+    ## [1] "f1 score of the model:  0.04"
+
+## Confusion Matrix and Error Metrics of Random Forest
+
+``` r
+confMatrix_rf = table(rf_pred_test, model_dftest$fraudulent)
+print(confMatrix_rf)
 ```
 
-```{r}
-# Predict
-rf_pred_train <- predict(rf_model, newdata = model_dftrain, type = "class")
-rf_pred_test <- predict(rf_model, newdata = model_dftest, type = "class")
+    ##             
+    ## rf_pred_test    0    1
+    ##            0 5087  107
+    ##            1    5  165
+
+``` r
+err_metric(confMatrix_rf)
 ```
 
-```{r}
-# Calculate AUC value
-calcAUC(as.numeric(rf_pred_train),model_dftrain$job_id)
-calcAUC(as.numeric(rf_pred_test), model_dftest$job_id)
+    ## [1] "Precision value of the model:  0.61"
+    ## [1] "Accuracy of the model:  0.98"
+    ## [1] "Recall value of the model:  0.02"
+    ## [1] "False Positive rate of the model:  0.02"
+    ## [1] "False Negative rate of the model:  0.03"
+    ## [1] "f1 score of the model:  0.04"
 
-```
-```{r}
-# Import package for KNN model
-library(kknn)
-```
+## Confusion Matrix and Error Metrics of KNN
 
-
-```{r}
-# Build KNN model
-knn <- kknn(job_id ~ has_company_logo + has_questions + fraudulent, model_dftrain, model_dftest, k = 25)
-View(knn)
+``` r
+confMatrix_knn = table(knn_pred_test, model_dftest$fraudulent)
+print(confMatrix_knn)
 ```
 
+    ##              
+    ## knn_pred_test    0    1
+    ##             0 5078  126
+    ##             1   14  146
 
-```{r}
-# Predict and calculate the value of AUC on the test set
-knn_pred_test <- predict(knn, newdata = model_dftest)
-calcAUC(as.numeric(knn_pred_test), model_dftest$job_id)
-
+``` r
+err_metric(confMatrix_knn)
 ```
-# Data Prediction
 
-# Evaluation
+    ## [1] "Precision value of the model:  0.54"
+    ## [1] "Accuracy of the model:  0.97"
+    ## [1] "Recall value of the model:  0.02"
+    ## [1] "False Positive rate of the model:  0.02"
+    ## [1] "False Negative rate of the model:  0.09"
+    ## [1] "f1 score of the model:  0.05"
+
+## Summary of Results
+
+| Metric    | Logistic Regression | Random Forest | KNN  |
+|-----------|---------------------|---------------|------|
+| Accuracy  | 0.97                | 0.98          | 0.97 |
+| Precision | 0.58                | 0.61          | 0.54 |
+| Recall    | 0.02                | 0.02          | 0.02 |
+| F1        | 0.04                | 0.04          | 0.05 |
+| AUC       | 0.95                | 0.80          | 0.77 |
+
+The Random Forest has achieved the best accuracy and precision while its
+f1 score is a little bit lower than KNN. However, Logistic Regression
+has achieved the highest AUC than others while its precision is lower
+than Random Forest. Given the precision score, we can conclude that
+Random Forest is the best in terms of classifying real and fake job
+postings.
+
+# Limitation and Improvement
+
+Since the dataset is highly imbalanced where most of the job postings
+are legitimate, and only few are fraudulent. Thus, real jobs are being
+identified quite well. Techniques to handle imbalanced data like SMOTE
+can be applied to make a fair comparison between real and fraudulent
+jobs. Besides, other NLP processing like TF-IDF vectorizer can be chosen
+to discover the best possible numerical/vectorial representation of the
+text strings for running ML models.
+
+# Conclusion
+
+In most instances, if something appears too good to be true, it probably
+is. Most of the fraudulent job description and requirements are vague
+and too good to be true such as easy work for unrealistic pay. Be aware
+of part-time, entry-level jobs that require minimum qualifications and
+little experience like data entry and administrative. Home based and job
+listings without company logo can be alarming. In terms of
+classification models, Random Forest gives the best accuracy and
+precision, however better results can be achieved with a more balanced
+dataset with sufficient use cases for both real and fake job postings.
+Finally, with a little research, we can not only find out if a company
+and a job are legit, but also discover if the company is a right fit.
