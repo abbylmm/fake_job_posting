@@ -1,5 +1,5 @@
 ---
-title: "WQD7004 Group Assignment"
+title: "WQD7004 Group Project"
 output: github_document
 ---
 
@@ -15,19 +15,42 @@ output: github_document
 
 # Introduction
 
-In recent years, due to advancement in modern technology. New job advertising has become a common issue. Fake job posting is becoming great concern for everyone. According to Habiba et all (2021), job advertisements which are fake and mostly willing to steal personal & professional information of job seekers instead of giving right jobs to them is known as job scam. This dataset contains 18k job description out of which about 800 are fake. The data consists of both textual information and meta-information about the jobs.
-
-# Initial Questions
-
--   What are the significant features of classifying fake job postings
--   Which classification model is the best to classify fake job postings
+Unlike the past when job seekers used newspapers to seek job opportunities, job seekers nowadays use employment website such as JobStreet, Linkedin, Indeed and countless due to advancement in modern technology and social communication. The authenticity of job postings has become critical with a constant increase in the number of job scams. According to Habiba et all (2021), job advertisements which are fake and steal personal & professional information of job seekers instead of giving right jobs to them is known as job scam. Job scams often involve fake online job ads in social platforms and untrusted job portals offering high paying jobs. Victims may also receive unsolicited messages from social media such as Whatsapp, Facebook, WeChat that offers jobs that do not exist. For example, job scammers will ask victims to disclose personal and/or banking details or transfer upfront fees to secure a interview or more information about the fraud jobs. Due to the growing concerns about job scams, our aim is to raise awareness of job seekers in the job application process and give a early warning sign to job seekers with Machine Learning (ML) and Natural Language Processing (NLP) approaches. 
 
 # Objectives
 
--   To identify key features of fraudulent job postings
--   To build a model to classify real or fake job postings
+-   To identify the key features of fraudulent job postings. 
+-   To build a model to classify real or fake job postings. 
+
+# Initial Questions
+
+-   What are the key features/characteristics of fraudulent job postings?
+-   Which classification model is the best to determine whether the job is real or not?
 
 # Data Cleaning and Pre-processing
+
+The dataset used in this project was published by the Employment Scam Aegean Dataset (EMSCAD) and was retrieved from [Kaggle](https://www.kaggle.com/datasets/shivamb/real-or-fake-fake-jobposting-prediction) and this data contains 17,880 observations out of which about 866 are fake, and 18 features. The data consists of a combination of numeric and text features. A brief definition of the variables is given below: 
+
+| Variable            | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| job_id              | ID of each job posting                                     |
+| title               | Description of position or job                             |
+| location            | Where the job is located                                   |
+| department          | Department of the job offered                              |
+| salary_range        | Expected salary range                                      |
+| company_profile     | Company information                                        |
+| description         | Description about the position offered                     |
+| requirements        | Pre-requisites to qualify for the job                      |
+| benefits            | Benefits provided by the job                               |
+| telecommuting       | Is work from home or remote work allowed                   |
+| has_company_logo    | Does the post have a company logo                          |
+| has_questions       | Does the post have any questions                           |
+| employment_type     | Full-time, part-time, contract, temporary and others       |
+| required_experience | Experience level, e.g. Entry level, Executive, Director... |
+| required_education  | Education level, e.g. High School, Bachelor, Master...     |
+| industry            | Relevant industry                                          |
+| function            | Job's functionality                                        |
+| fraudulent          | Target variable (0: Real, 1: Fake)                         |
 
 ## Import libraries
 
@@ -52,6 +75,12 @@ library(wordcloud2)
 library(tm)
 library(webshot)
 library(htmlwidgets)
+library(corrplot)
+library(ROCR)
+library(data.table)
+library(randomForest)
+library(kknn)
+library(caret)
 ```
 
 ## Load data
@@ -60,18 +89,23 @@ library(htmlwidgets)
 df <- read.csv("https://raw.githubusercontent.com/abbylmm/fake_job_posting/main/data/fake_job_postings.csv")
 ```
 
-## Summary data
+## Display n sample of the data
 
 ```{r}
 df_fake_job <- df
 sample_n(df_fake_job, 3)
+```
+
+## Summary data
+
+```{r}
 summary(df_fake_job)
 ```
 
 ## Check all the missing values - 'empty'
 
 ```{r}
-skim(df_fake_job)
+skim_without_charts(df_fake_job)
 ```
 
 ## Split location to country, state, city and fill empty with NA
@@ -159,11 +193,10 @@ viz_df[viz_df == ""] <- NA
 ## Visualize missing profile for each feature
 
 ```{r, warning=FALSE}
-plot_intro(viz_df, title = "Data Quality")
 plot_missing(viz_df)
 ```
 
-## Heatplot of missingness across the data frame
+## Heatplot of missingness across the dataframe
 
 ```{r, warning=FALSE}
 vis_miss(viz_df)
@@ -205,7 +238,7 @@ vis_dat(model_df)
 
 # Exploratory Data Analysis (EDA)
 
-Before building our models, we performed exploratory data analysis to understand the dataset.
+Before building our models, we performed exploratory data analysis to understand the dataset. 
 
 ## Visualize fraud and real
 
@@ -222,7 +255,7 @@ bar <- barplot(count,
 text(bar, count/2, labels = count)
 ```
 
-It is observable that there are 17,014 cases of legitimate job postings, while the number of fraudulent job postings is 866.
+It is observable that there are 17,014 cases of legitimate job postings, while the number of fraudulent job postings is 866. The fraud rate of this dataset is 4.84%. 
 
 ## Visualize country-wise job postings
 
@@ -252,6 +285,8 @@ barplot(height=temp$n,
         las=2)
 ```
 
+Top 10 countries with most of the number of job postings are US, GB, GR, CA, DE, NZ, IN, AU, PH, NL. United States listed 10,656 job postings, followed by 2,384 for United Kingdom and 940 for Greece. 
+
 ## Visualize the industries
 
 ```{r}
@@ -271,6 +306,8 @@ barplot(height=temp$n,
         las=2)
 ```
 
+Most job openings are IT related such as Information Technology and Services (1,734), Computer Software (1,376) and Internet (1,062). 
+
 ## Visualize the departments
 
 ```{r}
@@ -289,6 +326,8 @@ barplot(height=temp$n,
         cex.names=0.6, 
         las=2)
 ```
+
+Top hiring departments are Sales (551), Engineering (487) and Marketing (401). 
 
 ## Visualize the required experiences in the jobs
 
@@ -312,6 +351,8 @@ viz_df %>% group_by(required_experience) %>%
   geom_text(aes(label=round(n,0)), vjust=-0.6)
 ```
 
+Mid-Senior level jobs are in demand, followed by entry level and associate. 
+
 ## Visualize the required education in the jobs
 
 ```{r}
@@ -333,6 +374,8 @@ viz_df %>% group_by(required_education) %>%
                     fill = "Education") + 
   geom_text(aes(label=round(n,0)), vjust=-0.6)
 ```
+
+Most of the education requirements in job ads are at least Bachelor's degree. 
 
 ## Visualize fraudulent job postings based on employment types
 
@@ -358,7 +401,7 @@ df_new <- merge(df1, df2, by = c("employment_type")) %>%
                                              'Full-time',
                                              'Contract',
                                              'Temporary')))
-fig <- df_new %>% plot_ly()
+fig <- df_new %>% plot_ly(width = 700, height = 400)
 fig <- fig %>% add_trace(x = ~employment_type, y = ~pct_non_fraud, type = 'bar', 
              text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
@@ -373,6 +416,8 @@ fig <- fig %>% layout(title = "Employment types with % fraud and non-fraud",
          yaxis = list(title = "percentage"))
 fig
 ```
+
+The percentage of fraudulent job postings is the highest for part-time jobs, nearly 9%. Jobs without an employment type also have a high fraud rate, around 7%. 
 
 ## Visualize fraudulent job postings based on required experiences
 
@@ -399,7 +444,7 @@ df_new <- merge(df1, df2, by = c("required_experience")) %>%
                                                  'Mid-Senior level',
                                                  'Internship',
                                                  'Associate')))
-fig <- df_new %>% plot_ly()
+fig <- df_new %>% plot_ly(width = 700, height = 400)
 fig <- fig %>% add_trace(x = ~required_experience, y = ~pct_non_fraud, type = 'bar', 
              text = ~paste0(pct_non_fraud*100,"%"), textposition = 'outside', name = 'pct_non_fraud', 
              marker = list(color = 'rgb(158,202,225)', 
@@ -415,9 +460,11 @@ fig <- fig %>% layout(title = "Required experiences with % fraud and non-fraud",
 fig
 ```
 
+Most executive or entry level jobs that require minimum qualifications and little experience have highest fraud rate, nearly 7%. 
+
 ## Visualize fraudulent job postings based on job functions
 
-```{r}
+```{r, warning=FALSE}
 viz_df2 <- viz_df
 viz_df2$fraudulent[viz_df2$fraudulent == 1] <- "Fraud"
 viz_df2$fraudulent[viz_df2$fraudulent == 0] <- "Non Fraud"
@@ -455,9 +502,11 @@ ggplot(melted_temp, aes(x = function., y = value, fill = variable)) +
   ylab("percentage")
 ```
 
+The function with highest fraudulent job postings is Administrative, close to 19%, followed by Financial Analyst, Accounting/Auditing. Admin jobs seem most suspicious. Possibly, it's easy for scammers to disguise their scams. 
+
 ## Visualize fraudulent job postings based on required education
 
-```{r}
+```{r, warning=FALSE}
 temp <- na.omit(subset(viz_df2, select = c(required_education, fraudulent))) %>% 
   group_by(required_education, fraudulent) %>% 
   summarize(n = n(), .groups = 'drop') %>% 
@@ -492,7 +541,13 @@ ggplot(melted_temp, aes(x = required_education, y = value, fill = variable)) +
   ylab("percentage")
 ```
 
-## Word cloud of fraudulent job postings
+As high as 74% of fake jobs require little educational credentials - "Some High School Coursework". 
+
+## Word Cloud
+
+To visualize the fraud and real job postings, the WordCloud is used to see the top occurring keywords in the data. To do so, fraud and real job postings are separated into two text files and WordCloud has plotted accordingly. 
+
+## Word Cloud of fraudulent job postings
 
 ```{r, warning=FALSE}
 selected_df <- subset(viz_df, fraudulent == 1)
@@ -510,17 +565,17 @@ docs <- docs %>%
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-dtm <- TermDocumentMatrix(docs) 
-matrix <- as.matrix(dtm) 
-words <- sort(rowSums(matrix), decreasing=TRUE) 
+dtm <- TermDocumentMatrix(docs)
+matrix <- as.matrix(dtm)
+words <- sort(rowSums(matrix), decreasing=TRUE)
 df <- data.frame(word = names(words), freq=words)
 
-my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
-saveWidget(my_graph, "wordcloud_fraud.html", selfcontained = F)
-my_graph
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words = 200, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
 ```
 
-## Word cloud of non-fraudulent job postings
+Many of the fraudulent job postings have common keywords in the job titles - “Data Entry”, "Administrative", “Home Based”, “Earn Daily". 
+
+## Word Cloud of NON-fraudulent job postings
 
 ```{r, warning=FALSE}
 selected_df <- subset(viz_df, fraudulent == 0)
@@ -538,22 +593,278 @@ docs <- docs %>%
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-dtm <- TermDocumentMatrix(docs) 
-matrix <- as.matrix(dtm) 
-words <- sort(rowSums(matrix), decreasing=TRUE) 
+dtm <- TermDocumentMatrix(docs)
+matrix <- as.matrix(dtm)
+words <- sort(rowSums(matrix), decreasing=TRUE)
 df <- data.frame(word = names(words), freq=words)
 
-my_graph <- wordcloud2(df, color = "random-dark", backgroundColor = "white")
-saveWidget(my_graph, "wordcloud_real.html", selfcontained = F)
-my_graph
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words = 200, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
 ```
+
+Many of the NON-fraudulent job postings have common keywords in the job titles - "Manager", "Developer", "Engineer". 
 
 # Modeling
 
-## Classification
+Before modeling, a final dataset is determined. This project will use a dataset with these features for the final analysis: 
 
-## Regression
+-   fraudulent (target variable)
+-   telecommuting
+-   has_company_logo
+-   has_questions
+-   full_text: a combination of title, country, department, company_profile, description, requirements, benefits, employment_type, required_experience, required_education, industry and function
 
-# Data Prediction
+Three supervised machine learning algorithms used in the project are: 
+
+-   Logistic Regression
+-   Random Forest
+-   K-Nearest Neighbor (KNN)
+
+```{r}
+model_df <- subset(model_df, select = -c(job_id))
+names(model_df)
+```
+
+## Data pre-process (full_text)
+
+For this analysis, the entire full_text column is converted to a DocumentTermMatrix and then convert to a dataframe. 
+
+```{r, warning=FALSE}
+# temp <- subset(model_df, fraudulent == 1)
+docs <- Corpus(VectorSource(model_df$full_text))
+docs <- docs %>%
+  tm_map(removeNumbers) %>% # Remove numbers
+  tm_map(removePunctuation) %>% # Remove punctuation
+  tm_map(stripWhitespace) # Eliminate extra white spaces
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeWords, stopwords("english"))
+
+# Convert each full_text into a row with columns containing each term in the document and giving the frequency of unique words used in the full_text
+dtm <- DocumentTermMatrix(docs)
+sparse_data <- removeSparseTerms(dtm, 0.90) # Remove sparse data
+```
+
+```{r, warning=FALSE}
+# Convert to dataframe for further analysis
+sparse_data_df <- as.data.frame(as.matrix(sparse_data))
+final_df <- subset(sparse_data_df, select = -c(`–`))
+
+# Add other variables
+final_df$telecommuting <- model_df$telecommuting
+final_df$has_company_logo <- model_df$has_company_logo
+final_df$has_questions <- model_df$has_questions
+final_df$fraudulent <- model_df$fraudulent
+```
+
+## View the dimension of the dataframe
+
+```{r}
+dim(final_df)
+# 17880 rows, 313 columns
+```
+
+## Visualize data
+
+```{r}
+# Histogram
+par(mfrow=c(2,2))
+for(i in 310:313) {
+    hist(final_df[,i], main=names(final_df)[i], border="blue", col="yellow")
+}
+```
+
+```{r}
+# Boxplot
+par(mfrow=c(2,2))
+for(i in 310:313) {
+    boxplot(final_df[,i], main=names(final_df)[i], border="blue", col="yellow")
+}
+```
+
+## Correlation
+
+A correlation matrix is created to visualize the numeric data relationship. 
+
+```{r}
+# Calculate the correlation between each pair of numeric variables
+correlations <- cor(final_df[, 310:313])
+corrplot(correlations, method="circle")
+```
+
+has_company_logo and has_questions seem to have negative correlation with fraudulent. If the job posting has company logo or with questions, the likelihood of fraudulent decreases. 
+
+## Split data into 70% training, 30% testing
+
+```{r}
+# Using the same seed value, reproduce the division of the training and testing sets
+set.seed(123)
+train_index <- sample(dim(final_df)[1], 0.7 * dim(final_df)[1])
+model_dftrain<- final_df[train_index, ]
+model_dftest <- final_df[-train_index, ]
+paste("train sample size: ", dim(model_dftrain)[1])
+paste("test sample size: ", dim(model_dftest)[1])
+```
+
+## View training set
+
+```{r}
+sample_n(model_dftrain, 3)
+```
+
+## Convert the dependent variable as a factor
+
+```{r}
+model_dftrain$fraudulent = as.factor(model_dftrain$fraudulent)
+model_dftest$fraudulent = as.factor(model_dftest$fraudulent)
+```
+
+## Logistic Regression
+
+```{r, warning=FALSE}
+# Train logistic regression
+lr_model <- glm(formula = fraudulent ~ ., family = "binomial", data = model_dftrain)
+```
+
+### Predict the testing set
+
+```{r}
+lr_pred_test <- predict(lr_model, newdata = model_dftest, type = "response")
+```
+
+```{r}
+test <- model_dftest
+glm.probs = predict(lr_model, newdata = test, type = "response")
+test$pred_glm = ifelse(glm.probs > 0.5, "1", "0")
+test$pred_glm = as.factor(test$pred_glm)
+```
+
+### Calculate AUC of the model
+
+```{r}
+calcAUC <- function(predcol, outcol) {
+  perf <- performance(prediction(as.numeric(predcol), outcol == 1), "auc")
+  as.numeric(perf@y.values)
+}
+
+paste("AUC of Logistic Regression is", round(calcAUC(lr_pred_test, model_dftest$fraudulent), digits=4))
+```
+
+## Random Forest
+
+```{r}
+# Train random forest
+trcontrol <- trainControl(method = "repeatedcv", number = 2, repeats = 1, search = "random", verboseIter = TRUE)
+grid <- data.frame(mtry = c(100))
+rf_model <- train(fraudulent ~ ., method = "rf", data = model_dftrain, ntree = 200, trControl = trcontrol, tuneGrid = grid)
+rf_model
+```
+
+### Predict the testing set
+
+```{r}
+rf_pred_test <- predict(rf_model, newdata = model_dftest)
+```
+
+### Calculate AUC of the model
+
+```{r}
+paste("AUC of Random Forest is", round(calcAUC(rf_pred_test, model_dftest$fraudulent), digits=4))
+```
+
+## K-Nearest Neighbor (KNN)
+
+```{r}
+# Train knn
+knn <- kknn(fraudulent ~ ., model_dftrain, model_dftest, k = 25)
+# View(knn)
+```
+
+### Predict the testing set
+
+```{r}
+knn_pred_test <- predict(knn, newdata = model_dftest)
+```
+
+### Calculate AUC of the model
+
+```{r}
+paste("AUC of KNN is", round(calcAUC(knn_pred_test, model_dftest$fraudulent), digits=4))
+```
 
 # Evaluation
+
+Accuracy and area under the curve (AUC) are used to evaluate the effectiveness of models in terms of classifying real and fake job postings. However, the dataset used for training is highly imbalanced. Thus, it is necessary to use F1 scores, precision, and recall to evaluate the model's ability to identify both real and fake job postings. 
+
+-   Accuracy score: Metric that provides a general idea of the model performance. 
+-   AUC score: Measure how well the model can distinguish real and fake job postings. 
+-   Precision score: Percentage of positive predictions are accurate. 
+-   Recall score: Percentage of positive results that have been classified correctly by the model. 
+-   F1 score: Harmonic mean of precision and recall. 
+
+```{r}
+# Error Metrics -- Confusion Matrix
+err_metric=function(CM)
+{
+  TN = CM[1,1]
+  TP = CM[2,2]
+  FP = CM[1,2]
+  FN = CM[2,1]
+  precision = (TP)/(TP+FP)
+  recall_score = (FP)/(FP+TN)
+  
+  f1_score = 2*((precision*recall_score)/(precision+recall_score))
+  accuracy_model = (TP+TN)/(TP+TN+FP+FN)
+  False_positive_rate = (FP)/(FP+TN)
+  False_negative_rate = (FN)/(FN+TP)
+  
+  print(paste("Precision value of the model: ", round(precision,2)))
+  print(paste("Accuracy of the model: ", round(accuracy_model,2)))
+  print(paste("Recall value of the model: ", round(recall_score,2)))
+  print(paste("False Positive rate of the model: ", round(False_positive_rate,2)))
+  print(paste("False Negative rate of the model: ", round(False_negative_rate,2)))
+  print(paste("f1 score of the model: ", round(f1_score,2)))
+}
+```
+
+## Confusion Matrix and Error Metrics of Logistic Regression
+
+```{r}
+confMatrix_lr = table(test$pred_glm, test$fraudulent)
+print(confMatrix_lr)
+err_metric(confMatrix_lr)
+```
+
+## Confusion Matrix and Error Metrics of Random Forest
+
+```{r}
+confMatrix_rf = table(rf_pred_test, model_dftest$fraudulent)
+print(confMatrix_rf)
+err_metric(confMatrix_rf)
+```
+
+## Confusion Matrix and Error Metrics of KNN
+
+```{r}
+confMatrix_knn = table(knn_pred_test, model_dftest$fraudulent)
+print(confMatrix_knn)
+err_metric(confMatrix_knn)
+```
+
+## Summary of Results
+
+| Metric    | Logistic Regression | Random Forest | KNN  |
+| --------- | ------------------- | ------------- | ---- |
+| Accuracy  | 0.97                | 0.98          | 0.97 |
+| Precision | 0.58                | 0.61          | 0.54 |
+| Recall    | 0.02                | 0.02          | 0.02 |
+| F1        | 0.04                | 0.04          | 0.05 |
+| AUC       | 0.95                | 0.80          | 0.77 |
+
+The Random Forest has achieved the best accuracy and precision while its f1 score is a little bit lower than KNN. However, Logistic Regression has achieved the highest AUC than others while its precision is lower than Random Forest. Given the precision score, we can conclude that Random Forest is the best in terms of classifying real and fake job postings. 
+
+# Limitation and Improvement
+
+Since the dataset is highly imbalanced where most of the job postings are legitimate, and only few are fraudulent. Thus, real jobs are being identified quite well. Techniques to handle imbalanced data like SMOTE can be applied to make a fair comparison between real and fraudulent jobs. Besides, other NLP processing like TF-IDF vectorizer can be chosen to discover the best possible numerical/vectorial representation of the text strings for running ML models. 
+
+# Conclusion
+
+In most instances, if something appears too good to be true, it probably is. Most of the fraudulent job description and requirements are vague and too good to be true such as easy work for unrealistic pay. Be aware of part-time, entry-level jobs that require minimum qualifications and little experience like data entry and administrative. Home based and job listings without company logo can be alarming. In terms of classification models, Random Forest gives the best accuracy and precision, however better results can be achieved with a more balanced dataset with sufficient use cases for both real and fake job postings. Finally, with a little research, we can not only find out if a company and a job are legit, but also discover if the company is a right fit. 
